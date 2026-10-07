@@ -90,6 +90,7 @@ export function lagBordgruppe({ nummer, storrelse, x, y }) {
   return {
     id: nyId(),
     nummer,
+    navn: '',
     storrelse,
     langArm: 'venstre',
     x,
@@ -124,6 +125,31 @@ export function byttLangArm(gruppe, langArm) {
 /** Elevene som blir uten plass hvis gruppa krymper til `storrelse`. */
 export function eleverSomMisterPlass(gruppe, storrelse) {
   return gruppe.plasser.slice(storrelse).map((p) => p.elevId).filter(Boolean);
+}
+
+/** Navnet som vises på kartet: eget navn hvis læreren har gitt ett, ellers "Gruppe 3". */
+export function gruppenavn(gruppe) {
+  return gruppe.navn?.trim() || `Gruppe ${gruppe.nummer}`;
+}
+
+/** Kort variant til lister: eget navn eller "Gr. 3". */
+export function kortGruppenavn(gruppe) {
+  return gruppe.navn?.trim() || `Gr. ${gruppe.nummer}`;
+}
+
+/**
+ * Gir en gruppe et nytt nummer. Har en annen gruppe nummeret fra før, bytter
+ * de to nummer, slik at alle numrene fortsatt er ulike.
+ */
+export function settGruppenummer(bordgrupper, gruppeId, nummer) {
+  const gruppe = bordgrupper.find((g) => g.id === gruppeId);
+  if (!gruppe) return bordgrupper;
+  const nytt = Math.min(bordgrupper.length, Math.max(1, Math.round(nummer)));
+  return bordgrupper.map((g) => {
+    if (g.id === gruppeId) return { ...g, nummer: nytt };
+    if (g.nummer === nytt) return { ...g, nummer: gruppe.nummer };
+    return g;
+  });
 }
 
 /** Setter gruppenummer 1, 2, 3 ... i eksisterende rekkefølge. */

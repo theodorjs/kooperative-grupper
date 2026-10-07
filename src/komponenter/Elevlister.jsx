@@ -77,7 +77,7 @@ function Elevrad({ elev, plass, onEndreNavn, onFjern }) {
           }
         }}
       />
-      <span className="plassinfo">{plass ? `Gruppe ${plass.gruppe}, plass ${plass.plass}` : 'Uten plass'}</span>
+      <span className="plassinfo">{plass ? `${plass.gruppe}, plass ${plass.plass}` : 'Uten plass'}</span>
       <button type="button" className="lenkeknapp fare" onClick={onFjern}>
         Fjern
       </button>
@@ -108,7 +108,7 @@ export default function Elevlister({ data, endre }) {
   function fjern(elev) {
     const plass = elevensPlassIAktivtKart(data, elev.id);
     const sporsmal = plass
-      ? `${elev.navn} sitter på plass ${plass.plass} i gruppe ${plass.gruppe} i det aktive klassekartet. Plassen blir tom. Vil du fjerne eleven fra lista?`
+      ? `${elev.navn} sitter på plass ${plass.plass} i ${plass.gruppe} i det aktive klassekartet. Plassen blir tom. Vil du fjerne eleven fra lista?`
       : `Vil du fjerne ${elev.navn} fra lista?`;
     if (window.confirm(sporsmal)) endre((d) => fjernElev(d, liste.id, elev.id));
   }

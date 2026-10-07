@@ -3,9 +3,12 @@ import {
   beregnGruppestorrelser,
   beskrivAvvik,
   endreGruppestorrelse,
+  gruppenavn,
+  kortGruppenavn,
   lagBordgrupper,
   nyNummerering,
   ordneIRutenett,
+  settGruppenummer,
   standardPosisjoner,
 } from './grupper.js';
 
@@ -108,5 +111,26 @@ describe('endre en bordgruppe', () => {
   it('bruker klikkrekkefølgen som ny nummerering', () => {
     const ny = nyNummerering(full, [3, 2, 1, 0]);
     expect(ny.plasser.map((p) => p.nummer)).toEqual([4, 3, 2, 1]);
+  });
+});
+
+describe('gruppenavn og gruppenummer', () => {
+  const grupper = lagBordgrupper([4, 4, 3, 3], ROM);
+
+  it('viser «Gruppe N» når gruppa ikke har eget navn', () => {
+    expect(gruppenavn(grupper[1])).toBe('Gruppe 2');
+    expect(kortGruppenavn(grupper[1])).toBe('Gr. 2');
+    expect(gruppenavn({ ...grupper[1], navn: '  Løvene ' })).toBe('Løvene');
+    expect(kortGruppenavn({ ...grupper[1], navn: 'Løvene' })).toBe('Løvene');
+  });
+
+  it('bytter nummer med gruppa som hadde nummeret fra før', () => {
+    const ny = settGruppenummer(grupper, grupper[3].id, 1);
+    expect(ny.map((g) => g.nummer)).toEqual([4, 2, 3, 1]);
+    expect(new Set(ny.map((g) => g.nummer)).size).toBe(4);
+  });
+
+  it('holder nummeret innenfor antall grupper', () => {
+    expect(settGruppenummer(grupper, grupper[0].id, 9).map((g) => g.nummer)).toEqual([4, 2, 3, 1]);
   });
 });

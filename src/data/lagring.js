@@ -33,6 +33,7 @@ function normaliserGruppe(g, i) {
   return {
     id: tekst(g.id) || `gruppe-${i}`,
     nummer: tall(g.nummer, i + 1),
+    navn: tekst(g.navn).slice(0, 40),
     storrelse,
     langArm: g.langArm === 'hoyre' ? 'hoyre' : 'venstre',
     x: tall(g.x, 1),
@@ -71,6 +72,7 @@ export function normaliser(data) {
     navn: tekst(k.navn, 'Klassekart'),
     elevlisteId: tekst(k.elevlisteId),
     opprettet: erGyldigDato(k.opprettet) ? k.opprettet : iDag(),
+    visGruppenavn: k.visGruppenavn !== false,
     bordgrupper: (Array.isArray(k.bordgrupper) ? k.bordgrupper : []).filter(erObjekt).map(normaliserGruppe),
   }));
 

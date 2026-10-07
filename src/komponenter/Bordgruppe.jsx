@@ -1,3 +1,4 @@
+import { gruppenavn } from '../logikk/grupper.js';
 import { lagMal } from '../logikk/maler.js';
 import { lokalTilRom } from '../logikk/orientering.js';
 import { rollerForPlass } from '../logikk/roller.js';
@@ -16,6 +17,7 @@ export default function Bordgruppe({
   renummerering,
   onGruppePeker,
   onPultPeker,
+  visNavn = true,
 }) {
   const mal = lagMal(gruppe.storrelse, gruppe.langArm);
   const halvB = mal.bredde / 2 + KANT;
@@ -53,20 +55,23 @@ export default function Bordgruppe({
               erMaal={maal === plassId}
               erDratt={Boolean(draElevId) && plass.elevId === draElevId}
               klikknummer={klikknummer}
+              gruppeRotasjon={rotasjon}
               onPeker={(e) => onPultPeker(e, indeks)}
             />
           );
         })}
       </g>
-      <text
-        className="gruppenavn"
-        x={etikett.x * SKALA}
-        y={etikett.y * SKALA}
-        dy="0.35em"
-        onPointerDown={onGruppePeker}
-      >
-        Gruppe {gruppe.nummer}
-      </text>
+      {visNavn && (
+        <text
+          className="gruppenavn"
+          x={etikett.x * SKALA}
+          y={etikett.y * SKALA}
+          dy="0.35em"
+          onPointerDown={onGruppePeker}
+        >
+          {gruppenavn(gruppe)}
+        </text>
+      )}
     </g>
   );
 }
