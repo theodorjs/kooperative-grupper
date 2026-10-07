@@ -1,0 +1,947 @@
+/* Systemfonter: ingen eksterne fonter som kan spore brukeren. */
+:root {
+  --bakgrunn: #f4f5f7;
+  --flate: #ffffff;
+  --tekst: #1c232b;
+  --dempet: #5c6873;
+  --kant: #d4dae0;
+  --kant-sterk: #37474f;
+  --aksent: #1f5d8a;
+  --aksent-lys: #e5eff7;
+  --fare: #b3261e;
+  --varsel: #fff4e0;
+  --maal: #fff3c4;
+  --maal-kant: #c77700;
+  --radius: 8px;
+  --skygge: 0 1px 2px rgb(0 0 0 / 6%), 0 1px 6px rgb(0 0 0 / 4%);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--tekst);
+  line-height: 1.45;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bakgrunn);
+}
+
+body.drar {
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grabbing;
+}
+
+h1, h2, h3 {
+  line-height: 1.2;
+  margin: 0 0 0.6rem;
+}
+
+h2 {
+  font-size: 1.15rem;
+}
+
+h3 {
+  font-size: 0.95rem;
+  margin-top: 1rem;
+  color: var(--dempet);
+}
+
+p {
+  margin: 0 0 0.75rem;
+}
+
+/* ---------- Toppfelt og faner ---------- */
+
+.topp {
+  background: var(--flate);
+  border-bottom: 1px solid var(--kant);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topp-innhold {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0.6rem 1rem 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.apptittel {
+  font-size: 1.1rem;
+  margin: 0 0 0.6rem;
+}
+
+.faner {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+}
+
+.fane {
+  border: none;
+  background: none;
+  border-radius: 0;
+  border-bottom: 3px solid transparent;
+  padding: 0.5rem 0.9rem 0.6rem;
+  font-weight: 500;
+  color: var(--dempet);
+  white-space: nowrap;
+}
+
+.fane:hover {
+  background: var(--aksent-lys);
+}
+
+.fane[aria-current='page'] {
+  color: var(--aksent);
+  border-bottom-color: var(--aksent);
+}
+
+.side {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* ---------- Felles elementer ---------- */
+
+.kort {
+  background: var(--flate);
+  border: 1px solid var(--kant);
+  border-radius: var(--radius);
+  box-shadow: var(--skygge);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+button {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--kant);
+  border-radius: 6px;
+  background: var(--flate);
+  color: var(--tekst);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--aksent);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--aksent);
+  outline-offset: 2px;
+}
+
+button.hoved {
+  background: var(--aksent);
+  border-color: var(--aksent);
+  color: #fff;
+}
+
+button.fare {
+  color: var(--fare);
+}
+
+button.fare:hover:not(:disabled) {
+  border-color: var(--fare);
+}
+
+.lenkeknapp {
+  border: none;
+  background: none;
+  padding: 0.1rem 0.3rem;
+  color: var(--aksent);
+  text-decoration: underline;
+}
+
+.lenkeknapp.fare {
+  color: var(--fare);
+}
+
+input[type='text'],
+input[type='number'],
+input[type='date'],
+select,
+textarea {
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--kant);
+  border-radius: 6px;
+  background: var(--flate);
+  color: var(--tekst);
+  max-width: 100%;
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.skjema {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.skjema label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.skjema.rutenett {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin-bottom: 0.8rem;
+}
+
+.knapperad,
+.verktoyrad {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.verktoyrad + .verktoyrad {
+  margin-top: 0.6rem;
+}
+
+.overskriftsrad {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.overskriftsrad h2 {
+  margin: 0;
+}
+
+.dempet {
+  color: var(--dempet);
+}
+
+.liten {
+  font-size: 0.82rem;
+}
+
+.skjult {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.varsel {
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  background: var(--varsel);
+  margin: 0.5rem 0;
+}
+
+.varsel.feil {
+  background: #fde8e7;
+  color: var(--fare);
+}
+
+.app > .varsel {
+  max-width: 1400px;
+  margin: 0.75rem auto 0;
+}
+
+.avkryssing {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.ikon {
+  flex-shrink: 0;
+}
+
+.segment {
+  display: inline-flex;
+}
+
+.segment button {
+  border-radius: 0;
+  margin-left: -1px;
+  min-width: 2.4rem;
+  justify-content: center;
+}
+
+.segment button:first-child {
+  border-radius: 6px 0 0 6px;
+  margin-left: 0;
+}
+
+.segment button:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+.segment button[aria-pressed='true'] {
+  background: var(--aksent);
+  border-color: var(--aksent);
+  color: #fff;
+  position: relative;
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+legend {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--dempet);
+  margin-bottom: 0.35rem;
+  padding: 0;
+}
+
+.to-kolonner {
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .to-kolonner {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Oppstart ---------- */
+
+.oppstart {
+  max-width: 640px;
+  margin: 1rem auto;
+}
+
+.personvern {
+  background: var(--aksent-lys);
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+/* ---------- Elevlister ---------- */
+
+.listevalg {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.listeknapp {
+  width: 100%;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+}
+
+.listeknapp[aria-pressed='true'] {
+  border-color: var(--aksent);
+  background: var(--aksent-lys);
+}
+
+.listenavn {
+  font-weight: 600;
+}
+
+.elevtabell {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  columns: 2 320px;
+  column-gap: 1.5rem;
+}
+
+.elevrad {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.2rem 0;
+  border-bottom: 1px solid #eef1f4;
+  break-inside: avoid;
+}
+
+.navnefelt {
+  flex: 1;
+  min-width: 0;
+  border-color: transparent !important;
+  background: transparent !important;
+}
+
+.navnefelt:hover,
+.navnefelt:focus {
+  border-color: var(--kant) !important;
+  background: var(--flate) !important;
+}
+
+.plassinfo {
+  font-size: 0.78rem;
+  color: var(--dempet);
+  white-space: nowrap;
+}
+
+.elevlister form.knapperad {
+  margin-bottom: 0.8rem;
+}
+
+/* ---------- Klassekart ---------- */
+
+.kartvalg {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.kartvalg select {
+  max-width: 22rem;
+}
+
+.status {
+  margin: 0.8rem 0 0;
+  font-size: 0.9rem;
+}
+
+.status .avvik {
+  color: var(--maal-kant);
+  font-weight: 600;
+}
+
+.kart-oppsett {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .kart-oppsett {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kartflate {
+  padding: 0.5rem;
+}
+
+.kart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: calc(100vh - 120px);
+  margin: 0 auto;
+}
+
+.sidepanel {
+  position: sticky;
+  top: 4.5rem;
+  max-height: calc(100vh - 5.5rem);
+  overflow-y: auto;
+}
+
+.hint {
+  font-size: 0.88rem;
+  color: var(--dempet);
+}
+
+/* Rommet */
+.rom {
+  fill: #fdfdfc;
+  stroke: #263238;
+  stroke-width: 4;
+}
+
+.tavle {
+  fill: #263238;
+}
+
+.tavletekst {
+  font-size: 22px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: #263238;
+  letter-spacing: 1px;
+}
+
+/* Bordgrupper */
+.bordgruppe {
+  touch-action: none;
+}
+
+.gruppeflate {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 3;
+  cursor: grab;
+}
+
+.bordgruppe:hover .gruppeflate {
+  fill: rgb(31 93 138 / 5%);
+}
+
+.bordgruppe.valgt .gruppeflate {
+  fill: rgb(31 93 138 / 7%);
+  stroke: var(--aksent);
+  stroke-dasharray: 8 6;
+}
+
+.gruppenavn {
+  font-size: 17px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: #37474f;
+  cursor: grab;
+  paint-order: stroke;
+  stroke: #fdfdfc;
+  stroke-width: 4px;
+}
+
+/* Pulter */
+.pult {
+  cursor: grab;
+}
+
+.pult.tom {
+  cursor: grab;
+}
+
+.pultflate {
+  fill: #fff;
+  stroke: var(--kant-sterk);
+  stroke-width: 1.6;
+}
+
+.pult.tom .pultflate {
+  fill: #f6f7f8;
+  stroke-dasharray: 4 3;
+}
+
+.pult.maal .pultflate {
+  fill: var(--maal);
+  stroke: var(--maal-kant);
+  stroke-width: 3;
+  stroke-dasharray: none;
+}
+
+.pult.dratt {
+  opacity: 0.35;
+}
+
+.pult.renummerer {
+  cursor: pointer;
+}
+
+.stol {
+  fill: #e3e8eb;
+  stroke: #8a9aa3;
+  stroke-width: 1;
+}
+
+.plassnummer circle {
+  fill: #fff;
+  stroke: var(--kant-sterk);
+  stroke-width: 1.2;
+}
+
+.plassnummer text {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: var(--tekst);
+}
+
+.rollemerke circle {
+  stroke: #fff;
+  stroke-width: 0.8;
+}
+
+.rollemerke text {
+  font-size: 8px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: #fff;
+}
+
+.hengelaas path,
+.hengelaas rect {
+  stroke: var(--kant-sterk);
+  stroke-width: 1.3;
+}
+
+.hengelaas rect {
+  fill: var(--kant-sterk);
+}
+
+.elevnavn {
+  text-anchor: middle;
+  font-weight: 600;
+  fill: var(--tekst);
+  pointer-events: none;
+}
+
+.klikknummer circle {
+  fill: var(--aksent);
+  opacity: 0.92;
+}
+
+.klikknummer text {
+  fill: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.rolleforklaring {
+  list-style: none;
+  padding: 0.25rem 0.5rem;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-size: 0.85rem;
+}
+
+.rolleforklaring li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.rolleprikk {
+  display: inline-grid;
+  place-items: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* Elevpanel */
+.elevpanel {
+  transition: background 0.15s;
+}
+
+.elevpanel.maal {
+  background: var(--maal);
+  border-color: var(--maal-kant);
+}
+
+.elevliste {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.elevlapp {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--kant);
+  border-radius: 6px;
+  background: var(--flate);
+  cursor: grab;
+  touch-action: pan-y;
+  font-size: 0.9rem;
+}
+
+.elevlapp.utenplass {
+  border-color: var(--maal-kant);
+  background: #fffaf0;
+}
+
+.elevlapp.dratt {
+  opacity: 0.4;
+}
+
+.elevlapp .navn {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dragehank {
+  color: var(--dempet);
+  display: inline-flex;
+  touch-action: none;
+  padding: 0.15rem;
+}
+
+.lasknapp {
+  padding: 0.2rem 0.35rem;
+  color: var(--dempet);
+  border-color: transparent;
+  background: transparent;
+}
+
+.lasknapp.last {
+  color: var(--tekst);
+  background: var(--aksent-lys);
+  border-color: var(--aksent);
+}
+
+.dragespokelse {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+  transform: translate(10px, 10px);
+  background: var(--flate);
+  border: 2px solid var(--aksent);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 18%);
+  white-space: nowrap;
+}
+
+/* Gruppedetaljer */
+.plassliste {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.plassliste li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plassliste .avkryssing {
+  margin-left: auto;
+}
+
+.plassnr {
+  display: inline-grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 1.5px solid var(--kant-sterk);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.rotasjon {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.rotasjon input[type='range'] {
+  flex: 1;
+  min-width: 0;
+}
+
+.instruks {
+  background: var(--aksent-lys);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+/* ---------- Rolleoversikt ---------- */
+
+.ukenavigasjon {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.ukeoverskrift {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+}
+
+.rolletabell {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 1.25rem;
+}
+
+.rolletabell th {
+  color: #fff;
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  font-size: 1.05rem;
+  border: 2px solid #1c232b;
+  vertical-align: top;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.rollenummer {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6em;
+  height: 1.6em;
+  border-radius: 50%;
+  background: #fff;
+  color: #1c232b;
+  font-weight: 800;
+  margin-right: 0.2rem;
+}
+
+.rolletillegg {
+  font-weight: 400;
+  font-size: 0.85em;
+}
+
+.rolletabell td {
+  border: 1.5px solid #78868f;
+  padding: 0.5rem 0.75rem;
+  vertical-align: top;
+  font-weight: 500;
+}
+
+.rolletabell tbody tr:nth-child(even) td {
+  background: #f6f8f9;
+}
+
+.rollenavn.tom {
+  color: var(--dempet);
+}
+
+.stjerne {
+  font-weight: 800;
+  margin-left: 0.1em;
+}
+
+.fotnote {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.ferie {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.ferietittel {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.rollebunn {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rollebunn .dempet {
+  margin-left: auto;
+}
+
+/* ---------- Innstillinger ---------- */
+
+.innstillinger {
+  max-width: 900px;
+}
+
+.enkel-tabell {
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  font-size: 0.92rem;
+}
+
+.enkel-tabell th,
+.enkel-tabell td {
+  text-align: left;
+  padding: 0.35rem 1rem 0.35rem 0;
+  border-bottom: 1px solid var(--kant);
+}
+
+.ferieskjema {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
+.ferieskjema label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Vises bare ved utskrift */
+.kun-utskrift {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .side {
+    padding: 0.75rem;
+  }
+
+  .rolletabell {
+    font-size: 0.95rem;
+  }
+
+  .rolletabell th {
+    font-size: 0.85rem;
+    padding: 0.4rem;
+  }
+
+  .rolletabell td {
+    padding: 0.4rem;
+  }
+}

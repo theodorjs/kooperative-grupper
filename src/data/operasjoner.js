@@ -4,7 +4,7 @@
 import { nyId } from './id.js';
 import { beregnGruppestorrelser, lagBordgrupper } from '../logikk/grupper.js';
 import { finnElev, ryddUkjenteElever } from '../logikk/tildeling.js';
-import { formaterDato, iDag } from '../logikk/uke.js';
+import { iDag } from '../logikk/uke.js';
 
 const medInnstillinger = (data, endring) => ({
   ...data,
@@ -47,7 +47,7 @@ export function opprettElevliste(data, navn, elevnavn, dato = iDag()) {
     elever: elevnavn.map((n) => ({ id: nyId(), navn: n })),
   };
   const ny = { ...data, elevlister: [...data.elevlister, liste] };
-  return nyttKlassekart(medInnstillinger(ny, { aktivElevlisteId: liste.id }), `Klassekart ${formaterDato(dato, true)}`, dato);
+  return nyttKlassekart(medInnstillinger(ny, { aktivElevlisteId: liste.id }), standardKartnavn(ny), dato);
 }
 
 export function velgElevliste(data, listeId) {
@@ -116,6 +116,10 @@ export function fjernElev(data, listeId, elevId) {
 // ---------------------------------------------------------------------------
 // Klassekart
 // ---------------------------------------------------------------------------
+
+export function standardKartnavn(data) {
+  return `Klassekart ${data.klassekart.length + 1}`;
+}
 
 /** Nytt klassekart for den aktive elevlista, med grupper etter prinsippet. */
 export function nyttKlassekart(data, navn, dato = iDag()) {

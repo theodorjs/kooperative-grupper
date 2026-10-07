@@ -12,8 +12,10 @@
 // Plass 1 er alltid den fremste sidelengs pulten på høyre side, og resten
 // nummereres med klokka sett ovenfra med tavla foran.
 
-export const PULT_LANG = 0.7;
-export const PULT_KORT = 0.5;
+// Pultene er litt større enn ekte pulter (70 × 50 cm), slik at navnene kan
+// leses på utskriften. Forholdet 7:5 er det samme.
+export const PULT_LANG = 0.84;
+export const PULT_KORT = 0.6;
 
 const L = PULT_LANG;
 const K = PULT_KORT;
