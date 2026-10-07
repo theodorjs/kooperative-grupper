@@ -1,5 +1,8 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { htmlTilTekst, tolkSkolerute } from './skolerute.js';
+
+const lesTestdata = (navn) => readFileSync(new URL(`./testdata/${navn}`, import.meta.url), 'utf8');
 
 const kort = (ferier) => ferier.map((f) => `${f.navn} ${f.fra} ${f.til}`);
 
@@ -10,7 +13,44 @@ describe('HTML til tekst', () => {
   });
 });
 
+describe('skoleruta til Moss kommune 2026–2027', () => {
+  const tekst = lesTestdata('moss-2026-2027.txt');
+
+  it('finner høst-, jule-, vinter- og påskeferien', () => {
+    expect(kort(tolkSkolerute(tekst))).toEqual([
+      'Høstferie 2026-09-28 2026-10-02',
+      'Juleferie 2026-12-21 2027-01-03',
+      'Vinterferie 2027-02-22 2027-02-26',
+      'Påskeferie 2027-03-22 2027-03-29',
+    ]);
+  });
+
+  it('gir samme resultat når teksten står i HTML', () => {
+    const html = `<h2>${tekst.split('\n')[0]}</h2><ul>${tekst
+      .split('\n')
+      .filter((l) => l.startsWith('- '))
+      .map((l) => `<li>${l.slice(2)}</li>`)
+      .join('')}</ul>`;
+    expect(tolkSkolerute(html)).toEqual(tolkSkolerute(tekst));
+  });
+});
+
 describe('tolke skolerute', () => {
+  it('leser datoer uten punktum etter måneden, som "28.09–02.10.2026"', () => {
+    expect(kort(tolkSkolerute('Skoleåret 2026/2027\nPåskeferie: 22.03–29.03.2027'))).toEqual([
+      'Påskeferie 2027-03-22 2027-03-29',
+    ]);
+  });
+
+  it('bruker ikke "siste skoledag" som sluttdato for en ferie', () => {
+    expect(tolkSkolerute('Skoleåret 2026/2027\nSommerferie: fra 18.06.2027 (siste skoledag 17.06)')).toEqual([]);
+  });
+
+  it('tolker ikke klokkeslett som datoer', () => {
+    expect(tolkSkolerute('Skoleåret 2026/2027\nHøstferie: skolen stenger kl. 12.30, se egen oversikt')).toEqual([]);
+  });
+
+
   it('leser en liste med tekstlige datoer og henter årstall fra skoleåret', () => {
     const html = `
       <h2>Skolerute 2026/2027</h2>

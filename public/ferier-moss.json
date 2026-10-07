@@ -1,5 +1,26 @@
 {
   "kilde": "https://www.moss.kommune.no/alle-tjenester/skole-og-barnehage/skole-og-utdanning/skolearet-og-permisjon/skolerute/",
-  "hentet": null,
-  "ferier": []
+  "hentet": "2026-10-07",
+  "ferier": [
+    {
+      "navn": "Høstferie",
+      "fra": "2026-09-28",
+      "til": "2026-10-02"
+    },
+    {
+      "navn": "Juleferie",
+      "fra": "2026-12-21",
+      "til": "2027-01-03"
+    },
+    {
+      "navn": "Vinterferie",
+      "fra": "2027-02-22",
+      "til": "2027-02-26"
+    },
+    {
+      "navn": "Påskeferie",
+      "fra": "2027-03-22",
+      "til": "2027-03-29"
+    }
+  ]
 }

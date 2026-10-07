@@ -30,7 +30,7 @@ import {
   standardPosisjoner,
 } from '../logikk/grupper.js';
 import { gruppeRotasjon } from '../logikk/orientering.js';
-import { finnFerie, ROLLENUMRE, ROLLER, ukeforskyvning } from '../logikk/roller.js';
+import { ferieForUke, ROLLENUMRE, ROLLER, ukeforskyvning } from '../logikk/roller.js';
 import {
   fjernFraPlass,
   plasserElev,
@@ -39,7 +39,7 @@ import {
   tilfeldigFordeling,
   tomAllePlasser,
 } from '../logikk/tildeling.js';
-import { formaterDato, iDag, mandagForDato, ukeoverskrift } from '../logikk/uke.js';
+import { formaterDato, iDag, ukeoverskrift } from '../logikk/uke.js';
 import Bordgruppe from './Bordgruppe.jsx';
 import Elevpanel from './Elevpanel.jsx';
 import Gruppedetaljer from './Gruppedetaljer.jsx';
@@ -128,7 +128,7 @@ export default function Klassekart({ data, endre }) {
   const svgRef = useRef(null);
 
   const idag = iDag();
-  const ferie = finnFerie(mandagForDato(idag), ferier);
+  const ferie = ferieForUke(idag, ferier);
   const rolleuke = visRoller && !ferie ? ukeforskyvning(rotasjonStart, idag, ferier) : null;
   const navn = useMemo(() => new Map(elever.map((e) => [e.id, e.navn])), [elever]);
 

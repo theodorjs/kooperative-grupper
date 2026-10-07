@@ -195,8 +195,8 @@ export default function Innstillinger({ data, endre, erstatt }) {
       <section className="kort">
         <h2>Ferier</h2>
         <p className="dempet liten">
-          Rotasjonen står stille i ferieuker: en uke der mandagen er i en ferie, telles ikke. Uka etter ferien får elevene
-          nye roller, som etter en vanlig skoleuke.
+          Rotasjonen står stille i ferieuker, det vil si uker der minst tre av fem skoledager er ferie. Uka etter ferien
+          får elevene nye roller. Enkeltstående fridager, som 2. påskedag eller 17. mai, påvirker ikke rotasjonen.
         </p>
         <div className="ferieimport">
           <label className="avkryssing">

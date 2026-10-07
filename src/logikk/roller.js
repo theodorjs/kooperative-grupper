@@ -33,16 +33,39 @@ export function finnFerie(dato, ferier = []) {
   return ferier.find((f) => erGyldigDato(f.fra) && erGyldigDato(f.til) && f.fra <= dato && dato <= f.til) ?? null;
 }
 
+const SKOLEDAGER_I_UKA = 5;
+const MIN_FERIEDAGER_I_FERIEUKE = 3;
+
+/**
+ * Ferien i uka som `dato` ligger i, hvis uka er en ferieuke: minst tre av de
+ * fem skoledagene (mandag–fredag) er ferie. Enkeltstående fridager, som
+ * 2. påskedag på en mandag, gjør altså ikke uka til en ferieuke.
+ */
+export function ferieForUke(dato, ferier = []) {
+  const mandag = mandagForDato(dato);
+  const dager = new Map();
+  let feriedager = 0;
+  for (let i = 0; i < SKOLEDAGER_I_UKA; i += 1) {
+    const ferie = finnFerie(leggTilDager(mandag, i), ferier);
+    if (ferie) {
+      feriedager += 1;
+      dager.set(ferie, (dager.get(ferie) ?? 0) + 1);
+    }
+  }
+  if (feriedager < MIN_FERIEDAGER_I_FERIEUKE) return null;
+  return [...dager.entries()].sort((a, b) => b[1] - a[1])[0][0];
+}
+
 export function erFerieuke(dato, ferier = []) {
-  return finnFerie(mandagForDato(dato), ferier) !== null;
+  return ferieForUke(dato, ferier) !== null;
 }
 
 /**
- * Rollene rykker videre hver mandag som ikke er i en ferie. Rotasjonen står
+ * Rollene rykker videre hver mandag, unntatt i ferieuker. Rotasjonen står
  * altså stille bare i selve ferieuka, og uka etter ferien får nye roller.
  */
 function rotererDenneMandagen(mandag, ferier) {
-  return !finnFerie(mandag, ferier);
+  return !erFerieuke(mandag, ferier);
 }
 
 /**

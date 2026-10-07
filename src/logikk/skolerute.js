@@ -75,16 +75,11 @@ function mandagIUke(aar, uke) {
 
 /**
  * Finner datoene i en tekstbit, i den rekkefølgen de står. Hver dato får med
- * seg om den er merket som "siste skoledag" eller "første skoledag".
+ * seg om teksten rett foran (etter forrige dato) sier "siste skoledag" eller
+ * "første skoledag".
  */
 function finnDatoer(tekst, skolearStart) {
   const funn = [];
-  const merk = (indeks) => {
-    const for_ = tekst.slice(Math.max(0, indeks - 30), indeks).toLowerCase();
-    if (/siste\s+skoledag/.test(for_)) return 'siste';
-    if (/(første|1\.)\s+skoledag/.test(for_)) return 'forste';
-    return null;
-  };
 
   // "28. september 2026", "28. sept.", "28.–2. oktober" (første dag uten måned)
   const tekstlig = new RegExp(
@@ -94,29 +89,40 @@ function finnDatoer(tekst, skolearStart) {
   for (const m of tekst.matchAll(tekstlig)) {
     const maned = MANEDER[m[3].toLowerCase()];
     const aar = m[4] ? Number(m[4]) : aarForManed(maned, skolearStart);
+    const slutt = m.index + m[0].length;
     if (m[2]) {
       // "28.–2. oktober": første dag hører til måneden før hvis den er større.
       const forsteDag = Number(m[1]);
       const forsteManed = forsteDag > Number(m[2]) ? (maned === 1 ? 12 : maned - 1) : maned;
       const forsteAar = aar && forsteManed === 12 && maned === 1 ? aar - 1 : aar;
-      funn.push({ indeks: m.index, dag: forsteDag, maned: forsteManed, aar: forsteAar, merke: merk(m.index) });
-      funn.push({ indeks: m.index + 1, dag: Number(m[2]), maned, aar, merke: null });
+      funn.push({ indeks: m.index, slutt: m.index + 1, dag: forsteDag, maned: forsteManed, aar: forsteAar });
+      funn.push({ indeks: m.index + 1, slutt, dag: Number(m[2]), maned, aar });
     } else {
-      funn.push({ indeks: m.index, dag: Number(m[1]), maned, aar, merke: merk(m.index) });
+      funn.push({ indeks: m.index, slutt, dag: Number(m[1]), maned, aar });
     }
   }
 
-  // "28.09.2026", "28.9.26", "28.9."
-  const tall = /(?<![\d.])(\d{1,2})\.(\d{1,2})\.(?:(20\d\d|\d\d)(?!\d))?/g;
+  // "28.09.2026", "28.9.26", "28.9.", "28.09–02.10.2026", "(siste skoledag 18.12)"
+  const tall = /(?<![\d.])(\d{1,2})\.(\d{1,2})(?!\d)(?:\.((?:20)?\d\d)(?!\d))?/g;
   for (const m of tekst.matchAll(tall)) {
+    const dag = Number(m[1]);
     const maned = Number(m[2]);
-    if (maned < 1 || maned > 12) continue;
+    if (dag < 1 || dag > 31 || maned < 1 || maned > 12) continue;
     let aar = m[3] ? Number(m[3]) : aarForManed(maned, skolearStart);
     if (aar && aar < 100) aar += 2000;
-    funn.push({ indeks: m.index, dag: Number(m[1]), maned, aar, merke: merk(m.index) });
+    funn.push({ indeks: m.index, slutt: m.index + m[0].length, dag, maned, aar });
   }
 
-  return funn.sort((a, b) => a.indeks - b.indeks);
+  funn.sort((a, b) => a.indeks - b.indeks);
+  funn.forEach((dato, i) => {
+    const fraIndeks = Math.max(i > 0 ? funn[i - 1].slutt : 0, dato.indeks - 40);
+    const foran = tekst.slice(fraIndeks, dato.indeks).toLowerCase();
+    const siste = foran.search(/siste\s+skoledag/);
+    const forste = foran.search(/(første|1\.)\s+skoledag/);
+    if (siste === -1 && forste === -1) dato.merke = null;
+    else dato.merke = siste > forste ? 'siste' : 'forste';
+  });
+  return funn;
 }
 
 function finnUker(tekst, skolearStart) {
@@ -131,13 +137,19 @@ function finnUker(tekst, skolearStart) {
 
 /** Lager en periode fra datoene i en tekstbit, eller null. */
 function lagPeriode(tekst, skolearStart) {
-  const datoer = finnDatoer(tekst, skolearStart);
+  // "Siste skoledag" kan bare være starten på en ferie, og "første skoledag"
+  // bare slutten. Står de andre steder (for eksempel "fra 18.06 (siste
+  // skoledag 17.06)"), er de en opplysning og ikke en grense.
+  const alle = finnDatoer(tekst, skolearStart);
+  const datoer = alle.filter(
+    (d, i) => (d.merke !== 'siste' || i === 0) && (d.merke !== 'forste' || i === alle.length - 1),
+  );
   if (datoer.length >= 2) {
     const forste = datoer[0];
     const siste = datoer[datoer.length - 1];
     // Mangler årstall og skoleår, brukes årstallet fra den andre datoen.
     const aarFra = forste.aar ?? siste.aar;
-    let aarTil = siste.aar ?? forste.aar;
+    const aarTil = siste.aar ?? forste.aar;
     if (!aarFra || !aarTil) return null;
     let fra = iso(aarFra, forste.maned, forste.dag);
     let til = iso(aarTil, siste.maned, siste.dag);
