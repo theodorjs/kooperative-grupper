@@ -47,3 +47,17 @@ export function normaliserVinkel(grader) {
   if (v <= -180) v += 360;
   return v;
 }
+
+/** Hvor mange grader forbi loddrett en tekst kan helle før den snus. */
+export const SNUMARGIN = 15;
+
+/**
+ * Navn på pultene skal leses fra elevens side, men aldri stå opp ned for den
+ * som ser på kartet. Heller teksten mer enn 15° forbi loddrett (altså er den
+ * rotert mer enn 105° fra vannrett), snus den 180°. Hvilken vei eleven sitter,
+ * viser stolen. Margen gjør at navn som står omtrent loddrett, ikke hopper
+ * fram og tilbake når gruppa flyttes litt.
+ */
+export function tekstSkalSnus(grader) {
+  return Math.abs(normaliserVinkel(grader)) > 90 + SNUMARGIN;
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { lagMal, PULT_KORT, PULT_LANG, pultHalvmal } from './maler.js';
-import { autoRotasjon, blikkretning, lokalTilRom, roter, tavlaMidtpunkt } from './orientering.js';
+import { autoRotasjon, blikkretning, lokalTilRom, normaliserVinkel, roter, SNUMARGIN, tavlaMidtpunkt, tekstSkalSnus } from './orientering.js';
 
 const ROM = { bredde: 9, lengde: 10 };
 const MALER = [
@@ -175,6 +175,47 @@ describe('orientering mot tavla', () => {
       for (const [storrelse, arm] of MALER.filter(([s]) => s >= 3)) {
         const iRommet = lagMal(storrelse, arm).pulter.map((p) => lokalTilRom(p, pos, rot));
         expect(erMedKlokka(iRommet)).toBe(true);
+      }
+    }
+  });
+});
+
+describe('navn som ikke står opp ned', () => {
+  it('snur tekst som heller mer enn 15° forbi loddrett', () => {
+    expect(tekstSkalSnus(0)).toBe(false);
+    expect(tekstSkalSnus(90)).toBe(false);
+    expect(tekstSkalSnus(-90)).toBe(false);
+    expect(tekstSkalSnus(-100)).toBe(false);
+    expect(tekstSkalSnus(110)).toBe(true);
+    expect(tekstSkalSnus(135)).toBe(true);
+    expect(tekstSkalSnus(-140)).toBe(true);
+    expect(tekstSkalSnus(180)).toBe(true);
+    expect(tekstSkalSnus(-270)).toBe(false);
+  });
+
+  it('snur navnet på venstre arm i en gruppe oppe til venstre i rommet', () => {
+    // Som gruppe 4 i klassekartet fra læreren: armen peker skrått mot tavla.
+    const rot = autoRotasjon(2, 3, ROM);
+    const venstreArm = lagMal(3).pulter[2];
+    expect(tekstSkalSnus(rot + venstreArm.rotasjon)).toBe(true);
+    expect(tekstSkalSnus(rot + lagMal(3).pulter[0].rotasjon)).toBe(false);
+  });
+
+  it('snur ikke navn i grupper som står nesten midt foran tavla', () => {
+    const rot = autoRotasjon(4.6, 8.1, ROM);
+    for (const p of lagMal(3).pulter) expect(tekstSkalSnus(rot + p.rotasjon)).toBe(false);
+  });
+
+  it('gir aldri navn som står opp ned, uansett hvor gruppa står', () => {
+    for (let x = 0.5; x < ROM.bredde; x += 0.5) {
+      for (let y = 0.5; y < ROM.lengde; y += 0.5) {
+        const rot = autoRotasjon(x, y, ROM);
+        for (const [storrelse, arm] of MALER) {
+          for (const p of lagMal(storrelse, arm).pulter) {
+            const vinkel = rot + p.rotasjon + (tekstSkalSnus(rot + p.rotasjon) ? 180 : 0);
+            expect(Math.abs(normaliserVinkel(vinkel))).toBeLessThanOrEqual(90 + SNUMARGIN);
+          }
+        }
       }
     }
   });

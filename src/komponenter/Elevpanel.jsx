@@ -1,3 +1,4 @@
+import { kortGruppenavn } from '../logikk/grupper.js';
 import Ikon from './Ikon.jsx';
 
 const sorterNavn = (a, b) => a.navn.localeCompare(b.navn, 'nb');
@@ -12,7 +13,14 @@ export default function Elevpanel({ elever, kart, erMaal, draElevId, onStartDrag
   for (const gruppe of kart.bordgrupper) {
     gruppe.plasser.forEach((plass, indeks) => {
       if (plass.elevId) {
-        plassering.set(plass.elevId, { gruppe: gruppe.nummer, plass: plass.nummer, gruppeId: gruppe.id, indeks, last: plass.last });
+        plassering.set(plass.elevId, {
+          gruppe: gruppe.nummer,
+          gruppenavn: kortGruppenavn(gruppe),
+          plass: plass.nummer,
+          gruppeId: gruppe.id,
+          indeks,
+          last: plass.last,
+        });
       }
     });
   }
@@ -66,7 +74,7 @@ export default function Elevpanel({ elever, kart, erMaal, draElevId, onStartDrag
               <span className="dragehank"><Ikon navn="hank" storrelse={14} /></span>
               <span className="navn">{elev.navn}</span>
               <span className="plassinfo">
-                Gr. {p.gruppe} · pl. {p.plass}
+                {p.gruppenavn} · pl. {p.plass}
               </span>
               <button
                 type="button"

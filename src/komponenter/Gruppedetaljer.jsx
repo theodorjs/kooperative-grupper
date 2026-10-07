@@ -1,11 +1,36 @@
+import { useState } from 'react';
+import { gruppenavn } from '../logikk/grupper.js';
 import { normaliserVinkel } from '../logikk/orientering.js';
+
+function Navnefelt({ gruppe, onNavn }) {
+  const [utkast, setUtkast] = useState(gruppe.navn ?? '');
+  const lagre = () => {
+    const rent = utkast.replace(/\s+/g, ' ').trim();
+    if (rent !== (gruppe.navn ?? '')) onNavn(rent);
+    setUtkast(rent);
+  };
+  return (
+    <input
+      type="text"
+      value={utkast}
+      maxLength={40}
+      placeholder={`Gruppe ${gruppe.nummer}`}
+      onChange={(e) => setUtkast(e.target.value)}
+      onBlur={lagre}
+      onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+    />
+  );
+}
 
 /** Panel for å endre den valgte bordgruppa. */
 export default function Gruppedetaljer({
   gruppe,
+  antallGrupper,
   rotasjon,
   navn,
   renummerering,
+  onNummer,
+  onNavn,
   onStorrelse,
   onLangArm,
   onRotasjon,
@@ -25,11 +50,35 @@ export default function Gruppedetaljer({
   return (
     <section className="kort gruppedetaljer">
       <div className="overskriftsrad">
-        <h2>Gruppe {gruppe.nummer}</h2>
+        <h2>{gruppenavn(gruppe)}</h2>
         <button type="button" className="lenkeknapp" onClick={onLukk}>
           Lukk
         </button>
       </div>
+
+      <fieldset>
+        <legend>Nummer og navn</legend>
+        <div className="gruppenavnfelt">
+          <label>
+            Nummer
+            <select value={gruppe.nummer} onChange={(e) => onNummer(Number(e.target.value))}>
+              {Array.from({ length: antallGrupper }, (_, i) => i + 1).map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Navn (valgfritt)
+            <Navnefelt key={`${gruppe.id}:${gruppe.navn}`} gruppe={gruppe} onNavn={onNavn} />
+          </label>
+        </div>
+        <p className="dempet liten">
+          Nummeret bestemmer rekkefølgen i rolleoversikten. Velger du et nummer en annen gruppe har, bytter de to
+          nummer. Et navn vises i stedet for «Gruppe {gruppe.nummer}».
+        </p>
+      </fieldset>
 
       <fieldset>
         <legend>Antall plasser</legend>
@@ -90,6 +139,10 @@ export default function Gruppedetaljer({
 
       <fieldset>
         <legend>Plasser</legend>
+        <p className="dempet liten">
+          <strong>Låst:</strong> eleven blir sittende på plassen når du trykker «Tilfeldig fordeling», mens de andre
+          elevene får nye plasser. Du kan fortsatt flytte eleven selv ved å dra.
+        </p>
         <ul className="plassliste">
           {plasser.map((p) => (
             <li key={p.indeks}>

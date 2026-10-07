@@ -21,11 +21,13 @@ import {
   elevordForm,
   endreGruppestorrelse,
   eleverSomMisterPlass,
+  gruppenavn,
   lagBordgruppe,
   lagBordgrupper,
   nummererGrupper,
   nyNummerering,
   ordneIRutenett,
+  settGruppenummer,
   standardNummerering,
   standardPosisjoner,
 } from '../logikk/grupper.js';
@@ -169,7 +171,7 @@ export default function Klassekart({ data, endre }) {
   function fjernGruppe(gruppe) {
     const antall = gruppe.plasser.filter((p) => p.elevId).length;
     const tillegg = antall ? ` ${antall} ${elevordForm(antall)} blir uten plass.` : '';
-    if (!window.confirm(`Fjerne gruppe ${gruppe.nummer}?${tillegg} De andre gruppene får nye numre.`)) return;
+    if (!window.confirm(`Fjerne ${gruppenavn(gruppe)}?${tillegg} De andre gruppene får nye numre.`)) return;
     setValgtId(null);
     setRenummerering(null);
     endreKart((k) => ({ ...k, bordgrupper: nummererGrupper(k.bordgrupper.filter((g) => g.id !== gruppe.id)) }));
@@ -394,6 +396,14 @@ export default function Klassekart({ data, endre }) {
             <input type="checkbox" checked={visRoller} onChange={(e) => setVisRoller(e.target.checked)} />
             Vis roller denne uka
           </label>
+          <label className="avkryssing">
+            <input
+              type="checkbox"
+              checked={kart.visGruppenavn !== false}
+              onChange={(e) => endreKart((k) => ({ ...k, visGruppenavn: e.target.checked }))}
+            />
+            Vis gruppenavn
+          </label>
           <button type="button" onClick={() => window.print()}>
             <Ikon navn="skriver" /> Skriv ut klassekart
           </button>
@@ -442,6 +452,7 @@ export default function Klassekart({ data, endre }) {
                 renummerering={renummerering?.gruppeId === g.id ? renummerering.rekkefolge : null}
                 onGruppePeker={(e) => startGruppedrag(e, g)}
                 onPultPeker={(e, indeks) => pultPeker(e, g, indeks)}
+                visNavn={kart.visGruppenavn !== false}
               />
             ))}
           </svg>
@@ -465,6 +476,9 @@ export default function Klassekart({ data, endre }) {
           {valgt ? (
             <Gruppedetaljer
               gruppe={valgt}
+              antallGrupper={kart.bordgrupper.length}
+              onNummer={(n) => endreKart((k) => ({ ...k, bordgrupper: settGruppenummer(k.bordgrupper, valgt.id, n) }))}
+              onNavn={(tekst) => endreGruppe(valgt.id, (g) => ({ ...g, navn: tekst }))}
               rotasjon={gruppeRotasjon(valgt, rom)}
               navn={navn}
               renummerering={renummerering?.gruppeId === valgt.id ? renummerering.rekkefolge : null}

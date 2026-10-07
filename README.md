@@ -19,8 +19,10 @@ Klassekart og rolleoversikt kan skrives ut eller lagres som PDF.
 1. **Første oppstart:** lim inn elevlisten, ett navn per linje. Appen lager et klassekart med grupper etter ønsket
    gruppestørrelse (standard 4; 21 elever gir 3 grupper med 4 og 3 med 3).
 2. **Klassekart:** dra bordgruppene dit de står i rommet. De snur seg automatisk mot tavla. Dra elever fra listen til
-   plassene, eller trykk **Tilfeldig fordeling**. Klikk på en gruppe for å endre antall plasser, lang arm (5-grupper),
-   retning eller plassnummerering.
+   plassene, eller trykk **Tilfeldig fordeling**. Klikk på en gruppe for å endre nummer og navn, antall plasser, lang
+   arm (5-grupper), retning eller plassnummerering. **Vis gruppenavn** slår navnene på kartet av og på. En låst elev
+   blir sittende ved tilfeldig fordeling. Navnene på pultene leses fra elevens side, men snus hvis de ellers ville stått
+   opp ned på kartet; stolen viser hvilken vei eleven sitter.
 3. **Denne uka:** rolleoversikten. Plassnummeret er fast, rollen roterer hver mandag. Rotasjonen står stille i
    ferieuker (uker der minst tre av fem skoledager er ferie), og uka etter ferien får elevene nye roller.
 4. **Skriv ut** gir A4 stående for klassekartet og A4 liggende for rolleoversikten. Velg «Lagre som PDF» i

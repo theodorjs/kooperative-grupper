@@ -2,7 +2,7 @@
 // returnerer nye data, slik at de er enkle å teste og bruke fra React.
 
 import { nyId } from './id.js';
-import { beregnGruppestorrelser, lagBordgrupper } from '../logikk/grupper.js';
+import { beregnGruppestorrelser, gruppenavn, lagBordgrupper } from '../logikk/grupper.js';
 import { finnElev, ryddUkjenteElever } from '../logikk/tildeling.js';
 import { iDag } from '../logikk/uke.js';
 
@@ -100,7 +100,7 @@ export function endreElevnavn(data, listeId, elevId, navn) {
 export function elevensPlassIAktivtKart(data, elevId) {
   const kart = aktivtKlassekart(data);
   const funnet = kart ? finnElev(kart, elevId) : null;
-  return funnet ? { gruppe: funnet.gruppe.nummer, plass: funnet.plass.nummer } : null;
+  return funnet ? { gruppe: gruppenavn(funnet.gruppe), plass: funnet.plass.nummer } : null;
 }
 
 /** Fjerner eleven fra lista. Plassene eleven satt på i klassekart blir tomme. */
@@ -131,6 +131,7 @@ export function nyttKlassekart(data, navn, dato = iDag()) {
     navn: navn.trim() || 'Klassekart',
     elevlisteId: liste.id,
     opprettet: dato,
+    visGruppenavn: true,
     bordgrupper: lagBordgrupper(storrelser, data.innstillinger.rom),
   };
   return medInnstillinger({ ...data, klassekart: [...data.klassekart, kart] }, { aktivtKlassekartId: kart.id });

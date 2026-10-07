@@ -1,4 +1,5 @@
 import { PULT_LANG } from '../logikk/maler.js';
+import { tekstSkalSnus } from '../logikk/orientering.js';
 import { ROLLER } from '../logikk/roller.js';
 
 /** Modellen regner i meter, kartet tegnes i centimeter. */
@@ -38,9 +39,22 @@ function Hengelaas({ x, y }) {
 
 /**
  * Én pult. Tegnes i pultens egne koordinater: eleven sitter på positiv y-side
- * og ser mot negativ y. Navnet står derfor riktig vei sett fra eleven.
+ * og ser mot negativ y. Navnet står riktig vei sett fra eleven, unntatt når
+ * det da ville stått opp ned på kartet (se tekstSkalSnus). Stolen viser
+ * uansett hvilken vei eleven sitter.
  */
-export default function Pult({ pult, plass, plassId, navn, roller, erMaal, erDratt, klikknummer, onPeker }) {
+export default function Pult({
+  pult,
+  plass,
+  plassId,
+  navn,
+  roller,
+  erMaal,
+  erDratt,
+  klikknummer,
+  gruppeRotasjon = 0,
+  onPeker,
+}) {
   const klasser = ['pult'];
   if (erMaal) klasser.push('maal');
   if (erDratt) klasser.push('dratt');
@@ -50,6 +64,10 @@ export default function Pult({ pult, plass, plassId, navn, roller, erMaal, erDra
   const tekst = navn ? tilpassNavn(navn) : null;
   const linjehoyde = tekst ? tekst.storrelse * 1.1 : 0;
   const tekstY = tekst ? 7 - ((tekst.linjer.length - 1) * linjehoyde) / 2 : 0;
+
+  // Tekst som ellers ville stått opp ned på kartet, snus rundt sitt eget midtpunkt.
+  const snu = tekstSkalSnus(gruppeRotasjon + pult.rotasjon);
+  const snuRundt = (x, y) => (snu ? `rotate(180 ${x} ${y})` : undefined);
 
   return (
     <g
@@ -63,7 +81,7 @@ export default function Pult({ pult, plass, plassId, navn, roller, erMaal, erDra
 
       <g className="plassnummer">
         <circle cx={-B / 2 + 9.5} cy={-H / 2 + 9.5} r={7} />
-        <text x={-B / 2 + 9.5} y={-H / 2 + 9.5} dy="0.36em">
+        <text x={-B / 2 + 9.5} y={-H / 2 + 9.5} dy="0.36em" transform={snuRundt(-B / 2 + 9.5, -H / 2 + 9.5)}>
           {plass.nummer}
         </text>
       </g>
@@ -71,16 +89,25 @@ export default function Pult({ pult, plass, plassId, navn, roller, erMaal, erDra
       {roller?.map((rolle, i) => (
         <g key={rolle} className="rollemerke">
           <circle cx={B / 2 - 8.5 - i * 12} cy={-H / 2 + 8.5} r={5.6} fill={ROLLER[rolle].farge} />
-          <text x={B / 2 - 8.5 - i * 12} y={-H / 2 + 8.5} dy="0.36em">
+          <text
+            x={B / 2 - 8.5 - i * 12}
+            y={-H / 2 + 8.5}
+            dy="0.36em"
+            transform={snuRundt(B / 2 - 8.5 - i * 12, -H / 2 + 8.5)}
+          >
             {rolle}
           </text>
         </g>
       ))}
 
-      {plass.last && <Hengelaas x={-B / 2 + 24} y={-H / 2 + 9} />}
+      {plass.last && (
+        <g transform={snuRundt(-B / 2 + 24, -H / 2 + 10)}>
+          <Hengelaas x={-B / 2 + 24} y={-H / 2 + 9} />
+        </g>
+      )}
 
       {tekst && (
-        <text className="elevnavn" x={0} y={tekstY} fontSize={tekst.storrelse}>
+        <text className="elevnavn" x={0} y={tekstY} fontSize={tekst.storrelse} transform={snuRundt(0, 7)}>
           {tekst.linjer.map((linje, i) => (
             <tspan key={i} x={0} dy={i === 0 ? '0.35em' : linjehoyde}>
               {linje}
@@ -92,7 +119,7 @@ export default function Pult({ pult, plass, plassId, navn, roller, erMaal, erDra
       {klikknummer !== undefined && (
         <g className="klikknummer">
           <circle cx={0} cy={4} r={13} />
-          <text x={0} y={4} dy="0.36em">
+          <text x={0} y={4} dy="0.36em" transform={snuRundt(0, 4)}>
             {klikknummer ?? '?'}
           </text>
         </g>

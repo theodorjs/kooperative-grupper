@@ -9,7 +9,7 @@
 // står etter. Årstall som mangler, hentes fra skoleåret på siden
 // ("Skoleåret 2026/2027"): august–desember er første år, januar–juli andre.
 
-import { erGyldigDato, fraDagnummer, leggTilDager, tilDagnummer } from './uke.js';
+import { erGyldigDato, fraDagnummer, iDag, leggTilDager, tilDagnummer } from './uke.js';
 
 const MANEDER = {
   jan: 1, januar: 1,
@@ -169,44 +169,117 @@ function ferienavn(ord) {
   return storForbokstav(`${rot}ferie`);
 }
 
-/**
- * Tolker skoleruta. Returnerer ferier sortert etter dato:
- * [{ navn: 'Høstferie', fra: '2026-09-28', til: '2026-10-02' }, ...]
- */
-export function tolkSkolerute(innhold) {
-  const tekst = /<[a-z][\s\S]*>/i.test(innhold) ? htmlTilTekst(innhold) : innhold;
-  const linjer = tekst.split('\n');
+/** "jul", "julen", "sommerferien", "påsken" … → ferienavn, eller null. */
+function ferieForOrd(ord) {
+  const o = ord.toLowerCase();
+  const navn = [['jul', 'Juleferie'], ['høst', 'Høstferie'], ['vinter', 'Vinterferie'], ['påske', 'Påskeferie'],
+    ['sommer', 'Sommerferie'], ['pinse', 'Pinseferie']].find(([start]) => o.startsWith(start));
+  return navn ? navn[1] : null;
+}
+
+/** Skoleåret (startåret) som en dato hører til: august–juli. */
+function skolearForDato(dato) {
+  const [aar, maned] = dato.split('-').map(Number);
+  return maned >= 8 ? aar : aar - 1;
+}
+
+// Tillater ord imellom: "første skoledag for elevene etter jul".
+const SISTE_FOR = /siste\s+skoledag\b[^\d\n]{0,30}?\bfør\s+([a-zæøå]+)/i;
+const FORSTE_ETTER = /(?:første|1\.)\s+skoledag\b[^\d\n]{0,30}?\better\s+([a-zæøå]+)/i;
+
+/** Datoen som hører til en frase: første dato etter frasen, ellers siste før. */
+function datoVedFrase(linje, indeks, skolearStart) {
+  const datoer = finnDatoer(linje, skolearStart).filter((d) => d.aar);
+  const etter = datoer.find((d) => d.indeks > indeks);
+  const dato = etter ?? datoer.filter((d) => d.indeks < indeks).at(-1);
+  return dato ? iso(dato.aar, dato.maned, dato.dag) : null;
+}
+
+function tolkMedSkolear(linjer, skolearFraDato) {
   const ferier = [];
-  let skolearStart = null;
+  const sisteFor = [];
+  const forsteEtter = [];
+  let skolearStart = skolearFraDato;
+  let fantSkolear = false;
 
   linjer.forEach((linje, i) => {
     const aar = linje.match(SKOLEAAR);
     if (aar) {
       const forste = Number(aar[1]);
       const andre = Number(aar[2].length === 2 ? `20${aar[2]}` : aar[2]);
-      if (andre === forste + 1) skolearStart = forste;
+      if (andre === forste + 1) {
+        skolearStart = forste;
+        fantSkolear = true;
+      }
+    }
+
+    // "Siste skoledag før jul" og "første skoledag etter jul" huskes til slutt.
+    for (const [frase, liste] of [[SISTE_FOR, sisteFor], [FORSTE_ETTER, forsteEtter]]) {
+      const m = linje.match(frase);
+      const navn = m && ferieForOrd(m[1]);
+      const dato = navn && datoVedFrase(linje, m.index, skolearStart);
+      if (dato && erGyldigDato(dato)) liste.push({ navn, dato });
     }
 
     const treff = [...linje.matchAll(FERIEORD)];
+    // Står datoene foran ferienavnet ("(28.09-02.10) Høstferie"), leses
+    // teksten foran hvert navn. Ellers leses teksten etter.
+    const foranForste = linje.slice(0, treff[0]?.index ?? 0);
+    const datoerForan = finnDatoer(foranForste, skolearStart).length > 0 || /\buke\s*\d/i.test(foranForste);
+
     treff.forEach((t, j) => {
-      const slutt = treff[j + 1]?.index ?? linje.length;
-      let bit = linje.slice(t.index + t[0].length, slutt);
+      let bit = datoerForan
+        ? linje.slice(j > 0 ? treff[j - 1].index + treff[j - 1][0].length : 0, t.index)
+        : linje.slice(t.index + t[0].length, treff[j + 1]?.index ?? linje.length);
       let periode = lagPeriode(bit, skolearStart);
       // Står datoene på linja under (overskrift + avsnitt), les videre.
       const ingenDatoer = finnDatoer(bit, skolearStart).length === 0;
-      if (!periode && ingenDatoer && j === treff.length - 1) {
+      if (!periode && !datoerForan && ingenDatoer && j === treff.length - 1) {
         for (let n = 1; n <= 2 && !periode && i + n < linjer.length; n += 1) {
           if (HAR_FERIEORD.test(linjer[i + n]) || !DATOLINJE.test(linjer[i + n])) break;
           bit = `${bit} ${linjer[i + n]}`;
           periode = lagPeriode(bit, skolearStart);
         }
       }
-      if (!periode) return;
-      const lengde = tilDagnummer(periode.til) - tilDagnummer(periode.fra);
-      if (lengde < 0 || lengde > MAKS_FERIEDAGER) return;
-      ferier.push({ navn: ferienavn(t[0]), ...periode });
+      if (periode) ferier.push({ navn: ferienavn(t[0]), ...periode });
     });
   });
+
+  // Ferier som bare er beskrevet med siste og første skoledag.
+  for (const slutt of sisteFor) {
+    const start = forsteEtter
+      .filter((f) => f.navn === slutt.navn && f.dato > slutt.dato)
+      .sort((a, b) => a.dato.localeCompare(b.dato))[0];
+    if (!start) continue;
+    const periode = { fra: leggTilDager(slutt.dato, 1), til: leggTilDager(start.dato, -1) };
+    const finnes = ferier.some((f) => f.navn === slutt.navn && f.fra <= periode.til && periode.fra <= f.til);
+    if (!finnes) ferier.push({ navn: slutt.navn, ...periode });
+  }
+
+  const gyldige = ferier.filter((f) => {
+    const lengde = tilDagnummer(f.til) - tilDagnummer(f.fra);
+    return lengde >= 0 && lengde <= MAKS_FERIEDAGER;
+  });
+  return { ferier: gyldige, fantSkolear };
+}
+
+/**
+ * Tolker skoleruta. Returnerer ferier sortert etter dato:
+ * [{ navn: 'Høstferie', fra: '2026-09-28', til: '2026-10-02' }, ...]
+ *
+ * Står ikke skoleåret på siden, og datoene mangler årstall, brukes skoleåret
+ * som `dato` ligger i. Ligger alle feriene da i fortiden, viser siden trolig
+ * neste skoleår, og det brukes i stedet.
+ */
+export function tolkSkolerute(innhold, { dato = iDag() } = {}) {
+  const tekst = /<[a-z][\s\S]*>/i.test(innhold) ? htmlTilTekst(innhold) : innhold;
+  const linjer = tekst.split('\n');
+  const skolear = skolearForDato(dato);
+
+  let { ferier, fantSkolear } = tolkMedSkolear(linjer, skolear);
+  if (!fantSkolear && ferier.length > 0 && ferier.every((f) => f.til < dato)) {
+    ({ ferier } = tolkMedSkolear(linjer, skolear + 1));
+  }
 
   const unike = new Map(ferier.map((f) => [`${f.navn}|${f.fra}|${f.til}`, f]));
   return [...unike.values()].sort((a, b) => a.fra.localeCompare(b.fra) || a.navn.localeCompare(b.navn));

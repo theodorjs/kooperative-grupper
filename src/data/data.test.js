@@ -118,6 +118,8 @@ describe('lagring, eksport og import', () => {
     const data = dataMedKlasse();
     data.innstillinger.ferier.push({ id: 'f', navn: 'Høstferie', fra: '2026-09-28', til: '2026-10-02' });
     data.klassekart[0].bordgrupper[0].rotasjon = 12.5;
+    data.klassekart[0].bordgrupper[1].navn = 'Løvene';
+    data.klassekart[0].visGruppenavn = false;
     expect(tolkImport(JSON.stringify(data, null, 2))).toEqual(data);
   });
 

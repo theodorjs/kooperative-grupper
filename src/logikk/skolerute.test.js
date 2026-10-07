@@ -35,7 +35,48 @@ describe('skoleruta til Moss kommune 2026–2027', () => {
   });
 });
 
+describe('nettsiden til Moss kommune', () => {
+  // Teksten er hentet fra diagnosen i GitHub Actions 7. oktober 2026.
+  const tekst = lesTestdata('moss-nettside-utdrag.txt');
+
+  it('finner høst-, jule-, vinter- og påskeferien', () => {
+    expect(kort(tolkSkolerute(tekst, { dato: '2026-10-07' }))).toEqual([
+      'Høstferie 2026-09-28 2026-10-02',
+      'Juleferie 2026-12-19 2027-01-03',
+      'Vinterferie 2027-02-22 2027-02-26',
+      'Påskeferie 2027-03-22 2027-03-29',
+    ]);
+  });
+
+  it('leser datoer som står foran ferienavnet, også uten skoleår på siden', () => {
+    const utenSkolear = '(28.09-02.10) Høstferie\nMars 22.03-29.03 Påskeferie';
+    expect(kort(tolkSkolerute(utenSkolear, { dato: '2026-10-07' }))).toEqual([
+      'Høstferie 2026-09-28 2026-10-02',
+      'Påskeferie 2027-03-22 2027-03-29',
+    ]);
+  });
+
+  it('lager juleferie av siste skoledag før jul og første skoledag etter jul', () => {
+    const jul = 'Skolerute 2026-2027\nDesember 18.12 fredag Siste skoledag før jul\nJanuar 04.01 mandag Første skoledag etter jul';
+    expect(kort(tolkSkolerute(jul))).toEqual(['Juleferie 2026-12-19 2027-01-03']);
+  });
+
+  it('bruker neste skoleår når siden uten årstall ellers bare ville gitt ferier i fortiden', () => {
+    const utenSkolear = '(28.09-02.10) Høstferie\n(22.02 - 26.02) Vinterferie';
+    expect(kort(tolkSkolerute(utenSkolear, { dato: '2027-06-20' }))[0]).toBe('Høstferie 2027-09-28 2027-10-02');
+  });
+});
+
 describe('tolke skolerute', () => {
+  it('leser flere ferier med datoene foran på samme linje', () => {
+    const tekst = 'Skoleåret 2026/2027\n(28.09-02.10) Høstferie (22.02 - 26.02) Vinterferie';
+    expect(kort(tolkSkolerute(tekst))).toEqual([
+      'Høstferie 2026-09-28 2026-10-02',
+      'Vinterferie 2027-02-22 2027-02-26',
+    ]);
+  });
+
+
   it('leser datoer uten punktum etter måneden, som "28.09–02.10.2026"', () => {
     expect(kort(tolkSkolerute('Skoleåret 2026/2027\nPåskeferie: 22.03–29.03.2027'))).toEqual([
       'Påskeferie 2027-03-22 2027-03-29',
