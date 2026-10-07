@@ -41,7 +41,7 @@ describe('ferier', () => {
   const hostferie = { id: 'h', navn: 'Høstferie', fra: '2026-09-28', til: '2026-10-04' }; // uke(6)
   const ferier = [hostferie];
 
-  it('kjenner igjen ferieuker ut fra mandagen', () => {
+  it('kjenner igjen ferieuker', () => {
     expect(erFerieuke('2026-10-01', ferier)).toBe(true);
     expect(erFerieuke('2026-10-05', ferier)).toBe(false);
     expect(erFerieuke('2026-09-27', ferier)).toBe(false);
@@ -63,13 +63,30 @@ describe('ferier', () => {
     expect(ukeforskyvning(START, '2027-01-04', jul)).toBe(forJul + 1);
   });
 
-  it('teller uka som vanlig når ferien starter etter mandag', () => {
-    const jul = [{ id: 'j', navn: 'Juleferie', fra: '2026-12-23', til: '2027-01-03' }];
-    const forJul = ukeforskyvning(START, '2026-12-14', jul);
-    expect(ukeforskyvning(START, '2026-12-21', jul)).toBe(forJul + 1);
-    expect(erFerieuke('2026-12-21', jul)).toBe(false);
-    expect(ukeforskyvning(START, '2026-12-28', jul)).toBe(forJul + 1);
-    expect(ukeforskyvning(START, '2027-01-04', jul)).toBe(forJul + 2);
+  it('regner en uke som ferieuke når minst tre av fem skoledager er ferie', () => {
+    const fraOnsdag = [{ id: 'j', navn: 'Juleferie', fra: '2026-12-23', til: '2027-01-03' }];
+    expect(erFerieuke('2026-12-21', fraOnsdag)).toBe(true);
+    const fraTorsdag = [{ id: 'j', navn: 'Juleferie', fra: '2026-12-24', til: '2027-01-03' }];
+    expect(erFerieuke('2026-12-21', fraTorsdag)).toBe(false);
+    const forJul = ukeforskyvning(START, '2026-12-14', fraTorsdag);
+    expect(ukeforskyvning(START, '2026-12-21', fraTorsdag)).toBe(forJul + 1);
+    expect(ukeforskyvning(START, '2026-12-28', fraTorsdag)).toBe(forJul + 1);
+    expect(ukeforskyvning(START, '2027-01-04', fraTorsdag)).toBe(forJul + 2);
+  });
+
+  it('lar ikke 2. påskedag på mandag gjøre uka etter påske til ferieuke', () => {
+    const pask = [{ id: 'p', navn: 'Påskeferie', fra: '2027-03-22', til: '2027-03-29' }];
+    expect(erFerieuke('2027-03-22', pask)).toBe(true);
+    expect(erFerieuke('2027-03-29', pask)).toBe(false);
+    const forPask = ukeforskyvning(START, '2027-03-15', pask);
+    expect(ukeforskyvning(START, '2027-03-22', pask)).toBe(forPask);
+    expect(ukeforskyvning(START, '2027-03-29', pask)).toBe(forPask + 1);
+  });
+
+  it('teller uker med enkeltstående fridager som vanlige skoleuker', () => {
+    const fridag = [{ id: 'f', navn: '2. pinsedag', fra: '2027-05-17', til: '2027-05-17' }];
+    expect(erFerieuke('2027-05-17', fridag)).toBe(false);
+    expect(ukeforskyvning(START, '2027-05-17', fridag)).toBe(ukeforskyvning(START, '2027-05-17'));
   });
 
   it('teller ferier riktig også bakover fra start', () => {

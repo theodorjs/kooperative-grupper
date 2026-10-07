@@ -22,7 +22,7 @@ Klassekart og rolleoversikt kan skrives ut eller lagres som PDF.
    plassene, eller trykk **Tilfeldig fordeling**. Klikk på en gruppe for å endre antall plasser, lang arm (5-grupper),
    retning eller plassnummerering.
 3. **Denne uka:** rolleoversikten. Plassnummeret er fast, rollen roterer hver mandag. Rotasjonen står stille i
-   ferieuker (uker der mandagen er i en ferie), og uka etter ferien får elevene nye roller.
+   ferieuker (uker der minst tre av fem skoledager er ferie), og uka etter ferien får elevene nye roller.
 4. **Skriv ut** gir A4 stående for klassekartet og A4 liggende for rolleoversikten. Velg «Lagre som PDF» i
    utskriftsdialogen for å lage PDF.
 
@@ -66,6 +66,6 @@ Kildekoden er organisert slik:
 Arbeidsflyten `.github/workflows/publiser.yml` tester, henter ferier, bygger og publiserer appen ved hver push til
 `main` og hver mandag morgen.
 Første gang må Pages slås på: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-Appen blir da tilgjengelig på `https://<brukernavn>.github.io/Kooperative-Grupper/`.
+Appen ligger på https://theodorjs.github.io/kooperative-grupper/.
 
 `vite.config.js` bruker relativ `base` (`./`), så appen virker uansett hva repoet heter.

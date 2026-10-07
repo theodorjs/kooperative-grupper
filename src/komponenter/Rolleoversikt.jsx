@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { aktivtKlassekart, elevlisteForKart, oppdaterInnstillinger } from '../data/operasjoner.js';
 import {
-  finnFerie,
+  ferieForUke,
   flyttRotasjonStart,
   lagRolleoversikt,
   ROLLENUMRE,
@@ -32,7 +32,7 @@ export default function Rolleoversikt({ data, endre, gaTil }) {
   const { rotasjonStart, ferier } = data.innstillinger;
 
   const mandag = leggTilDager(mandagForDato(iDag()), 7 * ukeforskyvningVisning);
-  const ferie = finnFerie(mandag, ferier);
+  const ferie = ferieForUke(mandag, ferier);
   const k = ukeforskyvning(rotasjonStart, mandag, ferier);
   const rader = kart && liste ? lagRolleoversikt(kart, liste.elever, k) : [];
   const harFlereRoller = rader.some((r) => ROLLENUMRE.some((n) => r.celler[n].some((c) => c.navn && c.flereRoller)));
