@@ -183,8 +183,9 @@ function skolearForDato(dato) {
   return maned >= 8 ? aar : aar - 1;
 }
 
-const SISTE_FOR = /siste\s+skoledag\s+før\s+([a-zæøå]+)/i;
-const FORSTE_ETTER = /(?:første|1\.)\s+skoledag\s+etter\s+([a-zæøå]+)/i;
+// Tillater ord imellom: "første skoledag for elevene etter jul".
+const SISTE_FOR = /siste\s+skoledag\b[^\d\n]{0,30}?\bfør\s+([a-zæøå]+)/i;
+const FORSTE_ETTER = /(?:første|1\.)\s+skoledag\b[^\d\n]{0,30}?\better\s+([a-zæøå]+)/i;
 
 /** Datoen som hører til en frase: første dato etter frasen, ellers siste før. */
 function datoVedFrase(linje, indeks, skolearStart) {
