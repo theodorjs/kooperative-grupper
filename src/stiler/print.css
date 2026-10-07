@@ -1,0 +1,129 @@
+/*
+ * Utskrift. Sideformatet settes av siden som skrives ut:
+ *   klassekart:    A4 stående (se Klassekart.jsx)
+ *   rolleoversikt: A4 liggende (se Rolleoversikt.jsx)
+ * Alt skal være lesbart i svart-hvitt: tall og tekst bærer informasjonen,
+ * fargene er bare et tillegg.
+ */
+@media print {
+  :root {
+    --bakgrunn: #fff;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .ikke-utskrift,
+  .topp {
+    display: none !important;
+  }
+
+  .kun-utskrift {
+    display: block !important;
+  }
+
+  .side {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .kort {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Klassekart: hele rommet på én A4-side */
+  .klassekartside {
+    break-inside: avoid;
+  }
+
+  .kart-oppsett {
+    display: block;
+  }
+
+  .utskriftstopp {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1.5pt solid #000;
+    margin-bottom: 4mm;
+  }
+
+  .utskriftstopp h1 {
+    font-size: 18pt;
+    margin: 0 0 2mm;
+  }
+
+  .utskriftstopp p {
+    margin: 0;
+    font-size: 11pt;
+  }
+
+  .kart-svg {
+    width: 100%;
+    max-height: 245mm;
+  }
+
+  .gruppeflate {
+    fill: none !important;
+    stroke: none !important;
+  }
+
+  .pult.tom .pultflate {
+    fill: #fff;
+  }
+
+  .rom {
+    fill: #fff;
+  }
+
+  .rollemerke,
+  .rolleforklaring {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Rolleoversikt: stor skrift som kan leses fra pultene */
+  .rolleside {
+    break-inside: avoid;
+  }
+
+  .ukeoverskrift {
+    font-size: 26pt;
+    margin-bottom: 6mm;
+  }
+
+  .rolletabell {
+    font-size: 26pt;
+  }
+
+  .rolletabell th {
+    font-size: 15pt;
+    padding: 3mm;
+  }
+
+  .rolletabell td {
+    padding: 2.5mm 3mm;
+    border-color: #000;
+  }
+
+  .rolletabell.tett {
+    font-size: 18pt;
+  }
+
+  .rolletabell.tett td {
+    padding: 1.5mm 3mm;
+  }
+
+  .rolletabell tbody tr:nth-child(even) td {
+    background: none;
+  }
+
+  .fotnote {
+    font-size: 12pt;
+  }
+}
