@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.local
+.DS_Store
+
+# Sikkerhetskopier med elevdata skal aldri inn i repoet
+kooperative-grupper-*.json
