@@ -18,7 +18,7 @@ import { iDag, leggTilDager } from '../src/logikk/uke.js';
 
 const UTFIL = new URL(`../public/${FERIEKILDE.fil}`, import.meta.url);
 const BRUKERAGENT =
-  'Mozilla/5.0 (compatible; Kooperative-grupper/1.0; +https://github.com/theodorjs/Kooperative-Grupper)';
+  'Mozilla/5.0 (compatible; Kooperative-grupper/1.0; +https://github.com/theodorjs/kooperative-grupper)';
 
 const argument = (navn) => {
   const i = process.argv.indexOf(navn);

@@ -66,6 +66,6 @@ Kildekoden er organisert slik:
 Arbeidsflyten `.github/workflows/publiser.yml` tester, henter ferier, bygger og publiserer appen ved hver push til
 `main` og hver mandag morgen.
 Første gang må Pages slås på: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-Appen blir da tilgjengelig på `https://<brukernavn>.github.io/Kooperative-Grupper/`.
+Appen ligger på https://theodorjs.github.io/kooperative-grupper/.
 
 `vite.config.js` bruker relativ `base` (`./`), så appen virker uansett hva repoet heter.
