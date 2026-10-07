@@ -35,9 +35,17 @@ jobs:
         uses: actions/configure-pages@v5
 
       # Feiler hentingen, brukes feriene fra forrige publisering. Se loggen for detaljer.
+      # På pull requests er dette bare en prøve med full diagnose; ingenting publiseres.
       - name: Hent ferier fra Moss kommune
-        if: github.event_name != 'pull_request'
-        run: node scripts/hent-ferier.mjs --reserve "${{ steps.pages.outputs.base_url }}/ferier-moss.json"
+        env:
+          HENDELSE: ${{ github.event_name }}
+          RESERVE: ${{ steps.pages.outputs.base_url }}/ferier-moss.json
+        run: |
+          if [ "$HENDELSE" = "pull_request" ]; then
+            node scripts/hent-ferier.mjs --diagnose
+          else
+            node scripts/hent-ferier.mjs --reserve "$RESERVE"
+          fi
 
       - run: npm run build
       - if: github.event_name != 'pull_request'

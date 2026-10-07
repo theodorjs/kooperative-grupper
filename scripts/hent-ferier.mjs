@@ -5,6 +5,7 @@
 //   node scripts/hent-ferier.mjs                     henter fra kommunen
 //   node scripts/hent-ferier.mjs --fil side.html     tolker en lagret side (for testing)
 //   node scripts/hent-ferier.mjs --reserve <url>     bruker den publiserte fila hvis henting feiler
+//   node scripts/hent-ferier.mjs --diagnose          skriver alltid ut hele teksten på siden
 //
 // Skriptet stopper aldri publiseringen: feiler alt, beholdes fila som den er,
 // og det skrives en advarsel i loggen til GitHub Actions. Finner det ingen
@@ -101,6 +102,10 @@ function diagnose(side) {
   }
   console.log('Linjer med "ferie":');
   for (const l of ferielinjer.slice(0, 12)) console.log(`  ${l.slice(0, 200)}`);
+  if (process.argv.includes('--diagnose')) {
+    console.log('Hele teksten:');
+    for (const l of tekst.split('\n')) console.log(`  ${l.slice(0, 300)}`);
+  }
   console.log('Lenker om skolerute, ferier eller PDF:');
   for (const l of lenker.slice(0, 15)) console.log(`  ${l.tekst.slice(0, 60) || '(uten tekst)'} -> ${l.url}`);
   console.log('::endgroup::');
@@ -167,6 +172,7 @@ async function main() {
     return;
   }
 
+  if (process.argv.includes('--diagnose')) diagnose(side);
   await skriv({ kilde: FERIEKILDE.url, hentet: iDag(), ferier });
   console.log(`Fant ${ferier.length} ferier hos ${FERIEKILDE.navn} (${kilde}):`);
   for (const f of ferier) console.log(`  ${f.navn.padEnd(12)} ${f.fra} – ${f.til}`);
