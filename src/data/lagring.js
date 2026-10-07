@@ -77,7 +77,14 @@ export function normaliser(data) {
   const rom = erObjekt(inn.rom) ? inn.rom : {};
   const ferier = (Array.isArray(inn.ferier) ? inn.ferier : [])
     .filter((f) => erObjekt(f) && erGyldigDato(f.fra) && erGyldigDato(f.til))
-    .map((f, i) => ({ id: tekst(f.id) || `ferie-${i}`, navn: tekst(f.navn, 'Ferie'), fra: f.fra, til: f.til }));
+    .map((f, i) => ({
+      id: tekst(f.id) || `ferie-${i}`,
+      navn: tekst(f.navn, 'Ferie'),
+      fra: f.fra,
+      til: f.til,
+      ...(typeof f.kilde === 'string' && f.kilde ? { kilde: f.kilde } : {}),
+    }));
+  const ferieimport = erObjekt(inn.ferieimport) ? inn.ferieimport : {};
 
   const finnes = (liste, id) => liste.some((x) => x.id === id);
 
@@ -93,6 +100,10 @@ export function normaliser(data) {
         ? mandagForDato(inn.rotasjonStart)
         : standard.innstillinger.rotasjonStart,
       ferier,
+      ferieimport: {
+        aktiv: ferieimport.aktiv !== false,
+        hentet: erGyldigDato(ferieimport.hentet) ? ferieimport.hentet : null,
+      },
       rom: {
         bredde: Math.max(2, tall(rom.bredde, STANDARD_ROM.bredde)),
         lengde: Math.max(2, tall(rom.lengde, STANDARD_ROM.lengde)),

@@ -38,12 +38,11 @@ export function erFerieuke(dato, ferier = []) {
 }
 
 /**
- * Rollene rykker videre på en mandag bare når både denne uka og uka før er
- * skoleuker. Mandager i ferie telles ikke, og første uke etter en ferie
- * beholder rollene fra siste uke før ferien.
+ * Rollene rykker videre hver mandag som ikke er i en ferie. Rotasjonen står
+ * altså stille bare i selve ferieuka, og uka etter ferien får nye roller.
  */
 function rotererDenneMandagen(mandag, ferier) {
-  return !finnFerie(mandag, ferier) && !finnFerie(leggTilDager(mandag, -7), ferier);
+  return !finnFerie(mandag, ferier);
 }
 
 /**

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { brukImporterteFerier, hentImporterteFerier } from './data/ferieimport.js';
 import { lesData, skrivData } from './data/lagring.js';
 import Elevlister from './komponenter/Elevlister.jsx';
 import Innstillinger from './komponenter/Innstillinger.jsx';
@@ -24,6 +25,19 @@ export default function App() {
 
   const endre = useCallback((endring) => setData((d) => endring(d)), []);
   const erstatt = useCallback((nyData) => setData(nyData), []);
+
+  // Henter ferier fra skoleruta (fila ligger ved siden av appen, se ferieimport.js).
+  const ferieimportAktiv = data.innstillinger.ferieimport.aktiv;
+  useEffect(() => {
+    if (!ferieimportAktiv) return undefined;
+    let avbrutt = false;
+    hentImporterteFerier().then((resultat) => {
+      if (resultat && !avbrutt) endre((d) => brukImporterteFerier(d, resultat));
+    });
+    return () => {
+      avbrutt = true;
+    };
+  }, [ferieimportAktiv, endre]);
 
   const harElever = data.elevlister.length > 0;
 

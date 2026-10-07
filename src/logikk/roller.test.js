@@ -47,30 +47,33 @@ describe('ferier', () => {
     expect(erFerieuke('2026-09-27', ferier)).toBe(false);
   });
 
-  it('teller ikke ferieuka, og første uke etter ferien har samme roller som uka før', () => {
+  it('står stille i ferieuka, og uka etter ferien får nye roller', () => {
     const ukeFor = ukeforskyvning(START, uke(5), ferier);
-    const ukeEtter = ukeforskyvning(START, uke(7), ferier);
     expect(ukeFor).toBe(5);
-    expect(ukeEtter).toBe(ukeFor);
-    expect(ukeforskyvning(START, uke(8), ferier)).toBe(ukeFor + 1);
+    expect(ukeforskyvning(START, uke(6), ferier)).toBe(ukeFor);
+    expect(ukeforskyvning(START, uke(7), ferier)).toBe(ukeFor + 1);
+    expect(ukeforskyvning(START, uke(8), ferier)).toBe(ukeFor + 2);
   });
 
   it('står stille gjennom ferier på flere uker', () => {
     const jul = [{ id: 'j', navn: 'Juleferie', fra: '2026-12-19', til: '2027-01-03' }];
     const forJul = ukeforskyvning(START, '2026-12-14', jul);
-    expect(ukeforskyvning(START, '2027-01-04', jul)).toBe(forJul);
-    expect(ukeforskyvning(START, '2027-01-11', jul)).toBe(forJul + 1);
+    expect(ukeforskyvning(START, '2026-12-21', jul)).toBe(forJul);
+    expect(ukeforskyvning(START, '2026-12-28', jul)).toBe(forJul);
+    expect(ukeforskyvning(START, '2027-01-04', jul)).toBe(forJul + 1);
   });
 
-  it('teller ferie som starter midt i uka fra og med neste mandag', () => {
+  it('teller uka som vanlig når ferien starter etter mandag', () => {
     const jul = [{ id: 'j', navn: 'Juleferie', fra: '2026-12-23', til: '2027-01-03' }];
-    const sisteSkoleuke = ukeforskyvning(START, '2026-12-21', jul);
-    expect(sisteSkoleuke).toBe(ukeforskyvning(START, '2026-12-14', jul) + 1);
-    expect(ukeforskyvning(START, '2027-01-04', jul)).toBe(sisteSkoleuke);
+    const forJul = ukeforskyvning(START, '2026-12-14', jul);
+    expect(ukeforskyvning(START, '2026-12-21', jul)).toBe(forJul + 1);
+    expect(erFerieuke('2026-12-21', jul)).toBe(false);
+    expect(ukeforskyvning(START, '2026-12-28', jul)).toBe(forJul + 1);
+    expect(ukeforskyvning(START, '2027-01-04', jul)).toBe(forJul + 2);
   });
 
   it('teller ferier riktig også bakover fra start', () => {
-    expect(ukeforskyvning(uke(8), uke(5), ferier)).toBe(-1);
+    expect(ukeforskyvning(uke(8), uke(5), ferier)).toBe(-2);
   });
 });
 

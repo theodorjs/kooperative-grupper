@@ -76,7 +76,7 @@ export default function Rolleoversikt({ data, endre, gaTil }) {
         {kart && ferie && (
           <div className="ferie">
             <p className="ferietittel">Ferie</p>
-            <p>{ferie.navn}. Rollene står stille, og første uke etter ferien har de samme rollene som uka før.</p>
+            <p>{ferie.navn}. Rotasjonen står stille denne uka. Uka etter ferien får elevene nye roller.</p>
           </div>
         )}
 

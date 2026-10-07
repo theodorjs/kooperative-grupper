@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  # Henter skoleruta til Moss kommune på nytt hver mandag morgen.
+  schedule:
+    - cron: '17 3 * * 1'
 
 permissions:
   contents: read
@@ -26,6 +29,16 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+
+      - id: pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      # Feiler hentingen, brukes feriene fra forrige publisering. Se loggen for detaljer.
+      - name: Hent ferier fra Moss kommune
+        if: github.event_name != 'pull_request'
+        run: node scripts/hent-ferier.mjs --reserve "${{ steps.pages.outputs.base_url }}/ferier-moss.json"
+
       - run: npm run build
       - if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3

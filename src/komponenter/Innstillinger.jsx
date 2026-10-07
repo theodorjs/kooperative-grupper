@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FERIEKILDE, settFerieimport } from '../data/ferieimport.js';
 import { nyId } from '../data/id.js';
 import { oppdaterInnstillinger } from '../data/operasjoner.js';
 import { flyttRotasjonStart } from '../logikk/roller.js';
@@ -54,6 +55,7 @@ function Ferier({ ferier, onEndre }) {
               <th scope="col">Navn</th>
               <th scope="col">Fra</th>
               <th scope="col">Til</th>
+              <th scope="col">Kilde</th>
               <th scope="col"><span className="skjult">Handling</span></th>
             </tr>
           </thead>
@@ -63,14 +65,17 @@ function Ferier({ ferier, onEndre }) {
                 <td>{f.navn}</td>
                 <td>{formaterDato(f.fra, true)}</td>
                 <td>{formaterDato(f.til, true)}</td>
+                <td className="dempet">{f.kilde === FERIEKILDE.id ? FERIEKILDE.navn : 'Lagt inn selv'}</td>
                 <td>
-                  <button
-                    type="button"
-                    className="lenkeknapp fare"
-                    onClick={() => onEndre(ferier.filter((x) => x.id !== f.id))}
-                  >
-                    Slett
-                  </button>
+                  {f.kilde !== FERIEKILDE.id && (
+                    <button
+                      type="button"
+                      className="lenkeknapp fare"
+                      onClick={() => onEndre(ferier.filter((x) => x.id !== f.id))}
+                    >
+                      Slett
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -190,9 +195,30 @@ export default function Innstillinger({ data, endre, erstatt }) {
       <section className="kort">
         <h2>Ferier</h2>
         <p className="dempet liten">
-          Rotasjonen står stille i ferier. En uke der mandagen er i en ferie, telles ikke, og første uke etter ferien har
-          samme roller som uka før.
+          Rotasjonen står stille i ferieuker: en uke der mandagen er i en ferie, telles ikke. Uka etter ferien får elevene
+          nye roller, som etter en vanlig skoleuke.
         </p>
+        <div className="ferieimport">
+          <label className="avkryssing">
+            <input
+              type="checkbox"
+              checked={inn.ferieimport.aktiv}
+              onChange={(e) => endre((d) => settFerieimport(d, e.target.checked))}
+            />
+            Hent ferier automatisk fra skoleruta til {FERIEKILDE.navn}
+          </label>
+          {inn.ferieimport.aktiv && (
+            <p className="dempet liten">
+              {inn.ferieimport.hentet
+                ? `Sist oppdatert ${formaterDato(inn.ferieimport.hentet, true)}. `
+                : 'Feriene er ikke hentet ennå. De hentes når nettsiden publiseres, og deretter én gang i uka. '}
+              <a href={FERIEKILDE.url} target="_blank" rel="noreferrer noopener">
+                Se skoleruta hos {FERIEKILDE.navn}
+              </a>
+              . Sjekk gjerne at datoene stemmer. Ferier du legger inn selv, kommer i tillegg.
+            </p>
+          )}
+        </div>
         <Ferier ferier={inn.ferier} onEndre={(ferier) => sett({ ferier })} />
       </section>
 

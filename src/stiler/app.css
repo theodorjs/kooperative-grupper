@@ -922,6 +922,17 @@ legend {
   font-weight: 500;
 }
 
+.ferieimport {
+  background: var(--aksent-lys);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.ferieimport p {
+  margin: 0.4rem 0 0;
+}
+
 /* Vises bare ved utskrift */
 .kun-utskrift {
   display: none;

@@ -16,6 +16,7 @@ export function lagStandarddata(dato = iDag()) {
       onsketGruppestorrelse: 4,
       rotasjonStart: mandagForDato(dato),
       ferier: [],
+      ferieimport: { aktiv: true, hentet: null },
       rom: { ...STANDARD_ROM },
     },
   };
