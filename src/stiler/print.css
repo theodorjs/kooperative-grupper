@@ -19,6 +19,11 @@
     display: none !important;
   }
 
+  .app {
+    display: block;
+    min-height: 0;
+  }
+
   .kun-utskrift {
     display: block !important;
   }
