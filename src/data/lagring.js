@@ -1,5 +1,6 @@
 import { DATAVERSJON, lagStandarddata, STANDARD_ROM } from './standarddata.js';
 import { gyldigStorrelse, lagPlasser } from '../logikk/grupper.js';
+import { normaliserRoller, normaliserRotasjonsroller } from '../logikk/rollebibliotek.js';
 import { erGyldigDato, iDag, mandagForDato } from '../logikk/uke.js';
 
 // All data ligger lokalt i nettleseren under én nøkkel. Ingenting sendes ut.
@@ -89,11 +90,13 @@ export function normaliser(data) {
   const ferieimport = erObjekt(inn.ferieimport) ? inn.ferieimport : {};
 
   const finnes = (liste, id) => liste.some((x) => x.id === id);
+  const roller = normaliserRoller(data.roller);
 
   return {
     versjon: DATAVERSJON,
     elevlister,
     klassekart,
+    roller,
     innstillinger: {
       aktivElevlisteId: finnes(elevlister, inn.aktivElevlisteId) ? inn.aktivElevlisteId : elevlister[0]?.id ?? null,
       aktivtKlassekartId: finnes(klassekart, inn.aktivtKlassekartId) ? inn.aktivtKlassekartId : null,
@@ -101,6 +104,7 @@ export function normaliser(data) {
       rotasjonStart: erGyldigDato(inn.rotasjonStart)
         ? mandagForDato(inn.rotasjonStart)
         : standard.innstillinger.rotasjonStart,
+      rotasjonsroller: normaliserRotasjonsroller(inn.rotasjonsroller, roller),
       ferier,
       ferieimport: {
         aktiv: ferieimport.aktiv !== false,

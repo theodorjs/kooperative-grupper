@@ -5,9 +5,9 @@ import {
   flyttRotasjonStart,
   lagRolleoversikt,
   ROLLENUMRE,
-  ROLLER,
   ukeforskyvning,
 } from '../logikk/roller.js';
+import { rotasjonsroller } from '../logikk/rollebibliotek.js';
 import { iDag, leggTilDager, mandagForDato, ukeoverskrift } from '../logikk/uke.js';
 import Ikon from './Ikon.jsx';
 
@@ -30,6 +30,7 @@ export default function Rolleoversikt({ data, endre, gaTil }) {
   const kart = aktivtKlassekart(data);
   const liste = elevlisteForKart(data, kart);
   const { rotasjonStart, ferier } = data.innstillinger;
+  const roller = rotasjonsroller(data);
 
   const mandag = leggTilDager(mandagForDato(iDag()), 7 * ukeforskyvningVisning);
   const ferie = ferieForUke(mandag, ferier);
@@ -86,9 +87,9 @@ export default function Rolleoversikt({ data, endre, gaTil }) {
               <thead>
                 <tr>
                   {ROLLENUMRE.map((n) => (
-                    <th key={n} style={{ background: ROLLER[n].farge }} scope="col">
-                      <span className="rollenummer">{n}</span> {ROLLER[n].navn}
-                      {ROLLER[n].tillegg && <span className="rolletillegg"> {ROLLER[n].tillegg}</span>}
+                    <th key={n} style={{ background: roller[n - 1].farge }} scope="col">
+                      <span className="rollenummer">{n}</span> {roller[n - 1].navn}
+                      {roller[n - 1].tillegg && <span className="rolletillegg"> {roller[n - 1].tillegg}</span>}
                     </th>
                   ))}
                 </tr>
