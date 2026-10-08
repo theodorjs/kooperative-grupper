@@ -30,6 +30,10 @@ Klassekart og rolleoversikt kan skrives ut eller lagres som PDF.
 
 Rollenavn, farger og hvordan roller slås sammen i små grupper står i `src/logikk/roller.js`.
 
+**Fargevalg:** Under **Innstillinger** velger du lys, mørk eller automatisk (følger maskinen). Valget gjelder bare
+den nettleseren, og utskrifter blir alltid lyse. Fargene kommer fra fargesystemet i «Min bruksanvisning» og ligger i
+`src/stiler/farger.css`.
+
 ## Ferier fra skoleruta til Moss kommune
 
 Feriene hentes automatisk fra
@@ -61,7 +65,7 @@ Kildekoden er organisert slik:
 - `scripts/` – henting av ferier fra kommunen (kjøres av GitHub Actions).
 - `src/data/` – lagring, eksport/import og operasjoner på appdataene.
 - `src/komponenter/` – React-komponentene. Klassekartet tegnes som SVG.
-- `src/stiler/` – stiler for skjerm og utskrift.
+- `src/stiler/` – fargesystemet (`farger.css`) og stiler for skjerm og utskrift.
 
 ## Publisering på GitHub Pages
 

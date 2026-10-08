@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FERIEKILDE, settFerieimport } from '../data/ferieimport.js';
+import { brukFargetema, lagreFargetema, lesFargetema } from '../data/fargetema.js';
 import { nyId } from '../data/id.js';
 import { oppdaterInnstillinger } from '../data/operasjoner.js';
 import { flyttRotasjonStart } from '../logikk/roller.js';
@@ -26,6 +27,38 @@ function Tallfelt({ verdi, min, max, steg, onEndre, ...rest }) {
       onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
       {...rest}
     />
+  );
+}
+
+const FARGEVALG = [
+  { verdi: 'lys', navn: 'Lys' },
+  { verdi: 'mork', navn: 'Mørk' },
+  { verdi: 'auto', navn: 'Automatisk' },
+];
+
+function Fargevalg() {
+  const [valgt, setValgt] = useState(lesFargetema);
+
+  function velg(valg) {
+    setValgt(valg);
+    lagreFargetema(valg);
+    brukFargetema(valg);
+  }
+
+  return (
+    <section className="kort">
+      <h2>Fargevalg</h2>
+      <div className="segment" role="group" aria-label="Fargevalg">
+        {FARGEVALG.map((f) => (
+          <button key={f.verdi} type="button" aria-pressed={valgt === f.verdi} onClick={() => velg(f.verdi)}>
+            {f.navn}
+          </button>
+        ))}
+      </div>
+      <p className="dempet liten fargevalg-hjelp">
+        Automatisk følger innstillingen på maskinen. Valget gjelder bare denne nettleseren. Utskrifter blir alltid lyse.
+      </p>
+    </section>
   );
 }
 
@@ -121,6 +154,7 @@ export default function Innstillinger({ data, endre, erstatt }) {
 
   return (
     <div className="innstillinger">
+      <Fargevalg />
       <section className="kort">
         <h2>Grupper og rom</h2>
         <div className="skjema rutenett">
