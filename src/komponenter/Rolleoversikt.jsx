@@ -10,6 +10,7 @@ import {
 import { rotasjonsroller } from '../logikk/rollebibliotek.js';
 import { iDag, leggTilDager, mandagForDato, ukeoverskrift } from '../logikk/uke.js';
 import Ikon from './Ikon.jsx';
+import { Utskriftsknapp, useUtskrift } from './Utskrift.jsx';
 
 function Celle({ elever }) {
   if (elever.length === 0) return <td />;
@@ -27,6 +28,7 @@ function Celle({ elever }) {
 
 export default function Rolleoversikt({ data, endre, gaTil }) {
   const [ukeforskyvningVisning, setUkeforskyvningVisning] = useState(0);
+  const utskrift = useUtskrift('landscape');
   const kart = aktivtKlassekart(data);
   const liste = elevlisteForKart(data, kart);
   const { rotasjonStart, ferier } = data.innstillinger;
@@ -47,8 +49,8 @@ export default function Rolleoversikt({ data, endre, gaTil }) {
     );
 
   return (
-    <div className="rolleside">
-      <style>{'@page { size: A4 landscape; margin: 10mm; }'}</style>
+    <div className={`rolleside ${utskrift.papirklasse}`}>
+      {utskrift.sidestil}
 
       <div className="ukenavigasjon ikke-utskrift">
         <button type="button" onClick={() => setUkeforskyvningVisning((n) => n - 1)}>
@@ -114,9 +116,7 @@ export default function Rolleoversikt({ data, endre, gaTil }) {
 
       {kart && (
         <div className="rollebunn ikke-utskrift">
-          <button type="button" onClick={() => window.print()} disabled={Boolean(ferie)}>
-            <Ikon navn="skriver" /> Skriv ut rolleoversikt
-          </button>
+          <Utskriftsknapp tekst="Skriv ut rolleoversikt" onSkrivUt={utskrift.skrivUt} disabled={Boolean(ferie)} />
           <span className="dempet liten">Bygger på klassekartet «{kart.navn}».</span>
           <span className="liten">Juster rotasjonen:</span>
           <button type="button" onClick={() => juster(-1)}>

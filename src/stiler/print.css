@@ -126,4 +126,50 @@
   .fotnote {
     font-size: 12pt;
   }
+
+  /* A3: samme oppsett, større. Rolleoversikten får skrift som kan leses på avstand. */
+  .papir-a3 .utskriftstopp h1 {
+    font-size: 26pt;
+  }
+
+  .papir-a3 .utskriftstopp p {
+    font-size: 15pt;
+  }
+
+  .papir-a3 .kart-svg {
+    max-height: 360mm;
+  }
+
+  .papir-a3 .rolleforklaring {
+    font-size: 15pt;
+  }
+
+  .papir-a3 .ukeoverskrift {
+    font-size: 36pt;
+  }
+
+  .papir-a3 .rolletabell {
+    font-size: 36pt;
+  }
+
+  .papir-a3 .rolletabell th {
+    font-size: 21pt;
+    padding: 4mm;
+  }
+
+  .papir-a3 .rolletabell td {
+    padding: 3.5mm 4mm;
+  }
+
+  .papir-a3 .rolletabell.tett {
+    font-size: 25pt;
+  }
+
+  .papir-a3 .rolletabell.tett td {
+    padding: 2mm 4mm;
+  }
+
+  .papir-a3 .fotnote {
+    font-size: 16pt;
+  }
 }

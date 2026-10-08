@@ -451,6 +451,86 @@ legend {
   font-size: 0.9rem;
 }
 
+.status .lagres {
+  margin-left: 0.5rem;
+  font-size: 0.82rem;
+}
+
+/* Verktøyene på klassekartet, samlet etter hva de virker på */
+.verktoygrupper {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (max-width: 1150px) {
+  .verktoygrupper {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .verktoygrupper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.verktoygruppe {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  border: 1px solid var(--kant);
+  border-radius: 6px;
+  padding: 0.7rem 0.8rem 0.8rem;
+  min-width: 0;
+}
+
+.verktoygruppe-tittel {
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bk-teal-dark);
+  margin: 0;
+}
+
+.verktoygruppe .kartvalg,
+.verktoygruppe .kartvalg select {
+  max-width: 100%;
+}
+
+.verktoygruppe > .kartvalg:first-of-type select {
+  width: 100%;
+}
+
+/* Skriv ut: valg mellom A4 og A3 */
+.utskriftsvalg {
+  position: relative;
+  display: inline-block;
+}
+
+.utskriftsmeny {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.4rem;
+  background: var(--flate);
+  border: 1px solid var(--kant);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 18%);
+}
+
+.utskriftsmeny button {
+  min-width: 3.5rem;
+  justify-content: center;
+  font-weight: 600;
+}
+
 .status .avvik {
   color: var(--bk-amber-tekst);
   font-weight: 600;
