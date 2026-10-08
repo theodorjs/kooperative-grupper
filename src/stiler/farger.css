@@ -1,0 +1,103 @@
+/*
+ * Fargesystemet fra «Min bruksanvisning».
+ *
+ * Lys modus er standard. Mørk modus slås på med <html data-theme="dark">,
+ * eller av maskinens innstilling når ingen har valgt (data-theme mangler).
+ * <html data-theme="light"> tvinger lys modus.
+ *
+ * De mørke verdiene gjelder bare på skjerm, så utskrift alltid blir lys.
+ * De to mørke blokkene nederst må være like; det sjekker farger.test.js.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Grunnfargene */
+  --bk-teal: #0A7C6E;
+  --bk-teal-dark: #075E53;
+  --bk-teal-deep: #065349;
+  --bk-amber: #F59E0B;
+  --bk-orange: #FF6B35;
+  --bk-bg: #FAFAFA;
+  --bk-card: #FFFFFF;
+  --bk-line: #E7EAF0;
+  --bk-ink: #1F2937;
+  --bk-muted: #6B7280;
+
+  /* Statusfarger */
+  --bk-bom: #DD3333;
+  --bk-fare-flate: rgba(221, 51, 51, 0.12);
+  --bk-amber-flate: rgba(245, 158, 11, 0.16);
+  --bk-amber-tekst: #9A6200;
+
+  /* Flater */
+  --bk-teal-flate: rgba(10, 124, 110, 0.08);
+  --bk-noytral-flate: rgba(125, 140, 155, 0.10);
+  --bk-tabellflate: #F2F4FA;
+
+  /* Knapper med fylt bakgrunn */
+  --bk-knapp: #0A7C6E;
+  --bk-knapp-tekst: #FFFFFF;
+
+  /* Klassekartet */
+  --bk-rom: #FFFFFF;
+  --bk-pult: #FFFFFF;
+  --bk-pultkant: #1F2937;
+  --bk-stol: rgba(125, 140, 155, 0.22);
+
+  /* Rolletabellen: tydelige streker også i svart-hvitt-utskrift */
+  --bk-tabellkant-sterk: #1F2937;
+  --bk-tabellkant: #6B7280;
+
+  --bk-skygge: 0 1px 2px rgb(0 0 0 / 6%), 0 1px 6px rgb(0 0 0 / 4%);
+}
+
+@media screen {
+  html[data-theme="dark"] {
+    color-scheme: dark;
+    --bk-teal: #2FB3A2;
+    --bk-teal-dark: #8FD9CD;
+    --bk-teal-deep: #0E9384;
+    --bk-bg: #12161C;
+    --bk-card: #1B222A;
+    --bk-line: #2B3542;
+    --bk-ink: #E8ECF2;
+    --bk-muted: #98A3B3;
+    --bk-amber-tekst: #E8BB55;
+    --bk-teal-flate: rgba(47, 179, 162, 0.12);
+    --bk-tabellflate: #20262E;
+    --bk-knapp: #2FB3A2;
+    --bk-knapp-tekst: #12161C;
+    --bk-rom: #1B222A;
+    --bk-pult: #20262E;
+    --bk-pultkant: #98A3B3;
+    --bk-tabellkant-sterk: #2B3542;
+    --bk-tabellkant: #2B3542;
+    --bk-skygge: 0 1px 2px rgb(0 0 0 / 40%), 0 1px 6px rgb(0 0 0 / 25%);
+  }
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bk-teal: #2FB3A2;
+    --bk-teal-dark: #8FD9CD;
+    --bk-teal-deep: #0E9384;
+    --bk-bg: #12161C;
+    --bk-card: #1B222A;
+    --bk-line: #2B3542;
+    --bk-ink: #E8ECF2;
+    --bk-muted: #98A3B3;
+    --bk-amber-tekst: #E8BB55;
+    --bk-teal-flate: rgba(47, 179, 162, 0.12);
+    --bk-tabellflate: #20262E;
+    --bk-knapp: #2FB3A2;
+    --bk-knapp-tekst: #12161C;
+    --bk-rom: #1B222A;
+    --bk-pult: #20262E;
+    --bk-pultkant: #98A3B3;
+    --bk-tabellkant-sterk: #2B3542;
+    --bk-tabellkant: #2B3542;
+    --bk-skygge: 0 1px 2px rgb(0 0 0 / 40%), 0 1px 6px rgb(0 0 0 / 25%);
+  }
+}

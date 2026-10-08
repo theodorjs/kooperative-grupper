@@ -1,20 +1,24 @@
-/* Systemfonter: ingen eksterne fonter som kan spore brukeren. */
+/*
+ * Fargene kommer fra fargesystemet i farger.css (Min bruksanvisning).
+ * Systemfonter: ingen eksterne fonter som kan spore brukeren.
+ */
 :root {
-  --bakgrunn: #f4f5f7;
-  --flate: #ffffff;
-  --tekst: #1c232b;
-  --dempet: #5c6873;
-  --kant: #d4dae0;
-  --kant-sterk: #37474f;
-  --aksent: #1f5d8a;
-  --aksent-lys: #e5eff7;
-  --fare: #b3261e;
-  --varsel: #fff4e0;
-  --maal: #fff3c4;
-  --maal-kant: #c77700;
+  --bakgrunn: var(--bk-bg);
+  --flate: var(--bk-card);
+  --tekst: var(--bk-ink);
+  --dempet: var(--bk-muted);
+  --kant: var(--bk-line);
+  --kant-sterk: var(--bk-pultkant);
+  --aksent: var(--bk-teal);
+  --aksent-lys: var(--bk-teal-flate);
+  --fare: var(--bk-bom);
+  --varsel: var(--bk-amber-flate);
+  --maal: var(--bk-amber-flate);
+  --maal-kant: var(--bk-amber);
   --radius: 8px;
-  --skygge: 0 1px 2px rgb(0 0 0 / 6%), 0 1px 6px rgb(0 0 0 / 4%);
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --skygge: var(--bk-skygge);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  accent-color: var(--bk-teal);
   color: var(--tekst);
   line-height: 1.45;
 }
@@ -26,6 +30,7 @@
 body {
   margin: 0;
   background: var(--bakgrunn);
+  color: var(--tekst);
 }
 
 body.drar {
@@ -34,7 +39,12 @@ body.drar {
   cursor: grabbing;
 }
 
+a {
+  color: var(--bk-teal);
+}
+
 h1, h2, h3 {
+  font-family: Georgia, 'Times New Roman', serif;
   line-height: 1.2;
   margin: 0 0 0.6rem;
 }
@@ -100,8 +110,8 @@ p {
 }
 
 .fane[aria-current='page'] {
-  color: var(--aksent);
-  border-bottom-color: var(--aksent);
+  color: var(--bk-teal-dark);
+  border-bottom-color: var(--bk-amber);
 }
 
 .side {
@@ -153,9 +163,9 @@ textarea:focus-visible {
 }
 
 button.hoved {
-  background: var(--aksent);
-  border-color: var(--aksent);
-  color: #fff;
+  background: var(--bk-knapp);
+  border-color: var(--bk-knapp);
+  color: var(--bk-knapp-tekst);
 }
 
 button.fare {
@@ -267,7 +277,7 @@ textarea {
 }
 
 .varsel.feil {
-  background: #fde8e7;
+  background: var(--bk-fare-flate);
   color: var(--fare);
 }
 
@@ -309,9 +319,9 @@ textarea {
 }
 
 .segment button[aria-pressed='true'] {
-  background: var(--aksent);
-  border-color: var(--aksent);
-  color: #fff;
+  background: var(--bk-knapp);
+  border-color: var(--bk-knapp);
+  color: var(--bk-knapp-tekst);
   position: relative;
 }
 
@@ -395,7 +405,7 @@ legend {
   align-items: center;
   gap: 0.5rem;
   padding: 0.2rem 0;
-  border-bottom: 1px solid #eef1f4;
+  border-bottom: 1px solid var(--kant);
   break-inside: avoid;
 }
 
@@ -442,7 +452,7 @@ legend {
 }
 
 .status .avvik {
-  color: var(--maal-kant);
+  color: var(--bk-amber-tekst);
   font-weight: 600;
 }
 
@@ -485,20 +495,20 @@ legend {
 
 /* Rommet */
 .rom {
-  fill: #fdfdfc;
-  stroke: #263238;
+  fill: var(--bk-rom);
+  stroke: var(--bk-ink);
   stroke-width: 4;
 }
 
 .tavle {
-  fill: #263238;
+  fill: var(--bk-ink);
 }
 
 .tavletekst {
   font-size: 22px;
   font-weight: 700;
   text-anchor: middle;
-  fill: #263238;
+  fill: var(--bk-ink);
   letter-spacing: 1px;
 }
 
@@ -515,11 +525,11 @@ legend {
 }
 
 .bordgruppe:hover .gruppeflate {
-  fill: rgb(31 93 138 / 5%);
+  fill: var(--bk-teal-flate);
 }
 
 .bordgruppe.valgt .gruppeflate {
-  fill: rgb(31 93 138 / 7%);
+  fill: var(--bk-teal-flate);
   stroke: var(--aksent);
   stroke-dasharray: 8 6;
 }
@@ -528,10 +538,10 @@ legend {
   font-size: 17px;
   font-weight: 700;
   text-anchor: middle;
-  fill: #37474f;
+  fill: var(--tekst);
   cursor: grab;
   paint-order: stroke;
-  stroke: #fdfdfc;
+  stroke: var(--bk-rom);
   stroke-width: 4px;
 }
 
@@ -545,13 +555,13 @@ legend {
 }
 
 .pultflate {
-  fill: #fff;
+  fill: var(--bk-pult);
   stroke: var(--kant-sterk);
   stroke-width: 1.6;
 }
 
 .pult.tom .pultflate {
-  fill: #f6f7f8;
+  fill: var(--bk-noytral-flate);
   stroke-dasharray: 4 3;
 }
 
@@ -571,13 +581,13 @@ legend {
 }
 
 .stol {
-  fill: #e3e8eb;
-  stroke: #8a9aa3;
+  fill: var(--bk-stol);
+  stroke: var(--bk-muted);
   stroke-width: 1;
 }
 
 .plassnummer circle {
-  fill: #fff;
+  fill: var(--bk-pult);
   stroke: var(--kant-sterk);
   stroke-width: 1.2;
 }
@@ -590,7 +600,7 @@ legend {
 }
 
 .rollemerke circle {
-  stroke: #fff;
+  stroke: var(--bk-pult);
   stroke-width: 0.8;
 }
 
@@ -619,12 +629,12 @@ legend {
 }
 
 .klikknummer circle {
-  fill: var(--aksent);
+  fill: var(--bk-knapp);
   opacity: 0.92;
 }
 
 .klikknummer text {
-  fill: #fff;
+  fill: var(--bk-knapp-tekst);
   font-size: 15px;
   font-weight: 700;
   text-anchor: middle;
@@ -691,7 +701,7 @@ legend {
 
 .elevlapp.utenplass {
   border-color: var(--maal-kant);
-  background: #fffaf0;
+  background: var(--bk-amber-flate);
 }
 
 .elevlapp.dratt {
@@ -836,7 +846,7 @@ legend {
   text-align: left;
   padding: 0.6rem 0.75rem;
   font-size: 1.05rem;
-  border: 2px solid #1c232b;
+  border: 2px solid var(--bk-tabellkant-sterk);
   vertical-align: top;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
@@ -849,7 +859,7 @@ legend {
   height: 1.6em;
   border-radius: 50%;
   background: #fff;
-  color: #1c232b;
+  color: #1F2937;
   font-weight: 800;
   margin-right: 0.2rem;
 }
@@ -860,14 +870,14 @@ legend {
 }
 
 .rolletabell td {
-  border: 1.5px solid #78868f;
+  border: 1.5px solid var(--bk-tabellkant);
   padding: 0.5rem 0.75rem;
   vertical-align: top;
   font-weight: 500;
 }
 
 .rolletabell tbody tr:nth-child(even) td {
-  background: #f6f8f9;
+  background: var(--bk-tabellflate);
 }
 
 .rollenavn.tom {
@@ -949,6 +959,10 @@ legend {
 
 .ferieimport p {
   margin: 0.4rem 0 0;
+}
+
+.fargevalg-hjelp {
+  margin: 0.6rem 0 0;
 }
 
 /* Vises bare ved utskrift */
