@@ -32,7 +32,8 @@ import {
   standardPosisjoner,
 } from '../logikk/grupper.js';
 import { gruppeRotasjon } from '../logikk/orientering.js';
-import { ferieForUke, ROLLENUMRE, ROLLER, ukeforskyvning } from '../logikk/roller.js';
+import { rotasjonsroller } from '../logikk/rollebibliotek.js';
+import { ferieForUke, ukeforskyvning } from '../logikk/roller.js';
 import {
   fjernFraPlass,
   plasserElev,
@@ -132,6 +133,8 @@ export default function Klassekart({ data, endre }) {
   const idag = iDag();
   const ferie = ferieForUke(idag, ferier);
   const rolleuke = visRoller && !ferie ? ukeforskyvning(rotasjonStart, idag, ferier) : null;
+  const roller = rotasjonsroller(data);
+  const rollefarger = roller.map((r) => r.farge);
   const navn = useMemo(() => new Map(elever.map((e) => [e.id, e.navn])), [elever]);
 
   const kartId = kart?.id;
@@ -447,6 +450,7 @@ export default function Klassekart({ data, endre }) {
                 navn={navn}
                 valgt={g.id === valgtId}
                 rolleuke={rolleuke}
+                rollefarger={rollefarger}
                 maal={drag?.maal?.type === 'plass' ? drag.maal.id : null}
                 draElevId={draElevId}
                 renummerering={renummerering?.gruppeId === g.id ? renummerering.rekkefolge : null}
@@ -459,12 +463,12 @@ export default function Klassekart({ data, endre }) {
 
           {rolleuke !== null && (
             <ul className="rolleforklaring">
-              {ROLLENUMRE.map((r) => (
-                <li key={r}>
-                  <span className="rolleprikk" style={{ background: ROLLER[r].farge }}>
-                    {r}
+              {roller.map((rolle) => (
+                <li key={rolle.nummer}>
+                  <span className="rolleprikk" style={{ background: rolle.farge }}>
+                    {rolle.nummer}
                   </span>
-                  {ROLLER[r].navn}
+                  {rolle.navn}
                 </li>
               ))}
               <li className="dempet">{ukeoverskrift(idag)}</li>

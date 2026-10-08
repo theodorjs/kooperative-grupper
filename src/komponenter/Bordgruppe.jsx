@@ -12,6 +12,7 @@ export default function Bordgruppe({
   navn,
   valgt,
   rolleuke,
+  rollefarger,
   maal,
   draElevId,
   renummerering,
@@ -55,6 +56,7 @@ export default function Bordgruppe({
               erMaal={maal === plassId}
               erDratt={Boolean(draElevId) && plass.elevId === draElevId}
               klikknummer={klikknummer}
+              rollefarger={rollefarger}
               gruppeRotasjon={rotasjon}
               onPeker={(e) => onPultPeker(e, indeks)}
             />

@@ -28,7 +28,12 @@ Klassekart og rolleoversikt kan skrives ut eller lagres som PDF.
 4. **Skriv ut** gir A4 stående for klassekartet og A4 liggende for rolleoversikten. Velg «Lagre som PDF» i
    utskriftsdialogen for å lage PDF.
 
-Rollenavn, farger og hvordan roller slås sammen i små grupper står i `src/logikk/roller.js`.
+5. **Rollene:** biblioteket over samarbeidsrollene, som kort med ikon, navn og beskrivelse. Legg til nye roller,
+   endre eller slett dem. Øverst velger du hvilke fire roller som brukes i rotasjonen; navn, ikon og farge vises da i
+   «Denne uka» og på klassekartet. En rolle som står i rotasjonen, må byttes ut før den kan slettes.
+
+Standardrollene (fra plakatene) står i `src/logikk/rollebibliotek.js`. Hvordan rollene slås sammen i små grupper,
+står i `src/logikk/roller.js`.
 
 **Fargevalg:** Under **Innstillinger** velger du lys, mørk eller automatisk (følger maskinen). Valget gjelder bare
 den nettleseren, og utskrifter blir alltid lyse. Fargene kommer fra fargesystemet i «Min bruksanvisning» og ligger i

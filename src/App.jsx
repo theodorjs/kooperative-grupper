@@ -5,12 +5,14 @@ import Elevlister from './komponenter/Elevlister.jsx';
 import Innstillinger from './komponenter/Innstillinger.jsx';
 import Klassekart from './komponenter/Klassekart.jsx';
 import Oppstart from './komponenter/Oppstart.jsx';
+import Rollene from './komponenter/Rollene.jsx';
 import Rolleoversikt from './komponenter/Rolleoversikt.jsx';
 
 const FANER = [
   { id: 'uka', navn: 'Denne uka' },
   { id: 'kart', navn: 'Klassekart' },
   { id: 'elever', navn: 'Elever' },
+  { id: 'roller', navn: 'Rollene' },
   { id: 'innstillinger', navn: 'Innstillinger' },
 ];
 
@@ -81,6 +83,7 @@ export default function App() {
         {harElever && fane === 'uka' && <Rolleoversikt data={data} endre={endre} gaTil={setFane} />}
         {harElever && fane === 'kart' && <Klassekart data={data} endre={endre} />}
         {harElever && fane === 'elever' && <Elevlister data={data} endre={endre} />}
+        {harElever && fane === 'roller' && <Rollene data={data} endre={endre} />}
         {harElever && fane === 'innstillinger' && <Innstillinger data={data} endre={endre} erstatt={erstatt} />}
       </main>
     </div>

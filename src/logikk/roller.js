@@ -1,15 +1,10 @@
 import { erGyldigDato, fraDagnummer, leggTilDager, mandagForDato, tilDagnummer } from './uke.js';
 
 // ---------------------------------------------------------------------------
-// Konfigurasjon. Endre her for å endre rollenavn, farger eller rekkefølge.
+// Konfigurasjon. Rotasjonen har fire plasser (rolle 1–4). Hvilken rolle i
+// rollebiblioteket som står på hver plass, og navn, ikon og farge, ligger i
+// rollebibliotek.js og kan endres i fanen «Rollene».
 // ---------------------------------------------------------------------------
-
-export const ROLLER = {
-  1: { nummer: 1, navn: 'Materialforvalter', tillegg: '(og ordenselev)', farge: '#2E7D32' },
-  2: { nummer: 2, navn: 'Oppmuntrer', tillegg: '', farge: '#E65100' },
-  3: { nummer: 3, navn: 'Reporter', tillegg: '', farge: '#1565C0' },
-  4: { nummer: 4, navn: 'Sjekker', tillegg: '', farge: '#6A1B9A' },
-};
 
 export const ROLLENUMRE = [1, 2, 3, 4];
 
@@ -19,10 +14,10 @@ export const ROLLENUMRE = [1, 2, 3, 4];
  */
 export const ROLLEPOSISJONER = {
   1: [[1, 2, 3, 4]],                 // Alle roller
-  2: [[1, 3], [2, 4]],               // Materialforvalter og reporter / Oppmuntrer og sjekker
-  3: [[1], [2, 4], [3]],             // Oppmuntrer og sjekker er én dobbeltrolle
+  2: [[1, 3], [2, 4]],               // Rolle 1 og 3 / rolle 2 og 4
+  3: [[1], [2, 4], [3]],             // Rolle 2 og 4 er én dobbeltrolle
   4: [[1], [2], [3], [4]],
-  5: [[1], [2], [3], [4], [2]],      // To elever deler rollen som oppmuntrer
+  5: [[1], [2], [3], [4], [2]],      // To elever deler rolle 2
 };
 
 // ---------------------------------------------------------------------------

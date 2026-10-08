@@ -1,6 +1,5 @@
 import { PULT_LANG } from '../logikk/maler.js';
 import { tekstSkalSnus } from '../logikk/orientering.js';
-import { ROLLER } from '../logikk/roller.js';
 
 /** Modellen regner i meter, kartet tegnes i centimeter. */
 export const SKALA = 100;
@@ -52,6 +51,7 @@ export default function Pult({
   erMaal,
   erDratt,
   klikknummer,
+  rollefarger = [],
   gruppeRotasjon = 0,
   onPeker,
 }) {
@@ -88,7 +88,7 @@ export default function Pult({
 
       {roller?.map((rolle, i) => (
         <g key={rolle} className="rollemerke">
-          <circle cx={B / 2 - 8.5 - i * 12} cy={-H / 2 + 8.5} r={5.6} fill={ROLLER[rolle].farge} />
+          <circle cx={B / 2 - 8.5 - i * 12} cy={-H / 2 + 8.5} r={5.6} fill={rollefarger[rolle - 1]} />
           <text
             x={B / 2 - 8.5 - i * 12}
             y={-H / 2 + 8.5}
