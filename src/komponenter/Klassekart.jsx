@@ -46,7 +46,7 @@ import { formaterDato, iDag, ukeoverskrift } from '../logikk/uke.js';
 import Bordgruppe from './Bordgruppe.jsx';
 import Elevpanel from './Elevpanel.jsx';
 import Gruppedetaljer from './Gruppedetaljer.jsx';
-import Ikon from './Ikon.jsx';
+import { Utskriftsknapp, useUtskrift } from './Utskrift.jsx';
 import { SKALA } from './Pult.jsx';
 
 const DRAGTERSKEL = 5; // piksler før et klikk regnes som en dragning
@@ -85,9 +85,9 @@ function Kartvelger({ data, kart, endre, idag }) {
   const listenavn = (id) => data.elevlister.find((l) => l.id === id)?.navn ?? 'ukjent liste';
 
   return (
-    <div className="verktoyrad">
+    <Verktoygruppe tittel="Klassekart">
       <label className="kartvalg">
-        <span>Klassekart</span>
+        <span className="skjult">Velg klassekart</span>
         <select value={kart?.id ?? ''} onChange={(e) => endre((d) => velgKlassekart(d, e.target.value))}>
           {!kart && <option value="">Ingen valgt</option>}
           {data.klassekart.map((k) => (
@@ -97,24 +97,35 @@ function Kartvelger({ data, kart, endre, idag }) {
           ))}
         </select>
       </label>
-      <button type="button" onClick={nytt}>
-        Nytt
-      </button>
-      {kart && (
-        <>
-          <button type="button" onClick={dupliser}>
-            Dupliser
-          </button>
-          <button type="button" onClick={giNyttNavn}>
-            Gi nytt navn
-          </button>
-          <button type="button" className="fare" onClick={slett}>
-            Slett
-          </button>
-          <span className="dempet liten">Endringer lagres automatisk.</span>
-        </>
-      )}
-    </div>
+      <div className="knapperad">
+        <button type="button" onClick={nytt}>
+          Nytt
+        </button>
+        {kart && (
+          <>
+            <button type="button" onClick={dupliser}>
+              Dupliser
+            </button>
+            <button type="button" onClick={giNyttNavn}>
+              Gi nytt navn
+            </button>
+            <button type="button" className="fare" onClick={slett}>
+              Slett
+            </button>
+          </>
+        )}
+      </div>
+    </Verktoygruppe>
+  );
+}
+
+/** En gruppe verktøy med overskrift, så knappene står samlet etter hva de virker på. */
+function Verktoygruppe({ tittel, children }) {
+  return (
+    <section className="verktoygruppe" aria-label={tittel}>
+      <h2 className="verktoygruppe-tittel">{tittel}</h2>
+      {children}
+    </section>
   );
 }
 
@@ -129,6 +140,7 @@ export default function Klassekart({ data, endre }) {
   const [renummerering, setRenummerering] = useState(null); // { gruppeId, rekkefolge }
   const [drag, setDrag] = useState(null);
   const svgRef = useRef(null);
+  const utskrift = useUtskrift('portrait');
 
   const idag = iDag();
   const ferie = ferieForUke(idag, ferier);
@@ -335,9 +347,11 @@ export default function Klassekart({ data, endre }) {
   if (!kart) {
     return (
       <div className="klassekartside">
-        <section className="kort ikke-utskrift">
-          <Kartvelger data={data} kart={null} endre={endre} idag={idag} />
-          <p>Det finnes ikke noe klassekart for denne elevlisten ennå. Trykk «Nytt» for å lage et.</p>
+        <section className="kort verktoy ikke-utskrift">
+          <div className="verktoygrupper">
+            <Kartvelger data={data} kart={null} endre={endre} idag={idag} />
+          </div>
+          <p className="status">Det finnes ikke noe klassekart for denne elevlisten ennå. Trykk «Nytt» for å lage et.</p>
         </section>
       </div>
     );
@@ -355,61 +369,68 @@ export default function Klassekart({ data, endre }) {
   const L = rom.lengde * SKALA;
 
   return (
-    <div className="klassekartside">
-      <style>{'@page { size: A4 portrait; margin: 10mm; }'}</style>
+    <div className={`klassekartside ${utskrift.papirklasse}`}>
+      {utskrift.sidestil}
 
       <section className="kort verktoy ikke-utskrift">
-        <Kartvelger data={data} kart={kart} endre={endre} idag={idag} />
+        <div className="verktoygrupper">
+          <Kartvelger data={data} kart={kart} endre={endre} idag={idag} />
 
-        <div className="verktoyrad">
-          <label className="kartvalg">
-            <span>Ønsket gruppestørrelse</span>
-            <select
-              value={onsketGruppestorrelse}
-              onChange={(e) =>
-                endre((d) => oppdaterInnstillinger(d, { onsketGruppestorrelse: Number(e.target.value) }))
-              }
-            >
-              {[1, 2, 3, 4, 5].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button type="button" onClick={lagGrupperPaNytt}>
-            Lag grupper på nytt
-          </button>
-          <button type="button" onClick={leggTilGruppe}>
-            Legg til bordgruppe
-          </button>
-          <button type="button" onClick={ordne}>
-            Ordne i rutenett
-          </button>
-        </div>
+          <Verktoygruppe tittel="Bordgrupper">
+            <label className="kartvalg">
+              <span>Ønsket størrelse</span>
+              <select
+                value={onsketGruppestorrelse}
+                onChange={(e) =>
+                  endre((d) => oppdaterInnstillinger(d, { onsketGruppestorrelse: Number(e.target.value) }))
+                }
+              >
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="knapperad">
+              <button type="button" onClick={leggTilGruppe}>
+                Legg til bordgruppe
+              </button>
+              <button type="button" onClick={ordne}>
+                Ordne i rutenett
+              </button>
+              <button type="button" className="fare" onClick={lagGrupperPaNytt}>
+                Lag grupper på nytt
+              </button>
+            </div>
+          </Verktoygruppe>
 
-        <div className="verktoyrad">
-          <button type="button" className="hoved" onClick={fordelTilfeldig} disabled={elever.length === 0}>
-            Tilfeldig fordeling
-          </button>
-          <button type="button" onClick={tomAlle}>
-            Tøm alle plasser
-          </button>
-          <label className="avkryssing">
-            <input type="checkbox" checked={visRoller} onChange={(e) => setVisRoller(e.target.checked)} />
-            Vis roller denne uka
-          </label>
-          <label className="avkryssing">
-            <input
-              type="checkbox"
-              checked={kart.visGruppenavn !== false}
-              onChange={(e) => endreKart((k) => ({ ...k, visGruppenavn: e.target.checked }))}
-            />
-            Vis gruppenavn
-          </label>
-          <button type="button" onClick={() => window.print()}>
-            <Ikon navn="skriver" /> Skriv ut klassekart
-          </button>
+          <Verktoygruppe tittel="Elever">
+            <div className="knapperad">
+              <button type="button" className="hoved" onClick={fordelTilfeldig} disabled={elever.length === 0}>
+                Tilfeldig fordeling
+              </button>
+              <button type="button" className="fare" onClick={tomAlle}>
+                Tøm alle plasser
+              </button>
+            </div>
+          </Verktoygruppe>
+
+          <Verktoygruppe tittel="Visning">
+            <label className="avkryssing">
+              <input type="checkbox" checked={visRoller} onChange={(e) => setVisRoller(e.target.checked)} />
+              Vis roller denne uka
+            </label>
+            <label className="avkryssing">
+              <input
+                type="checkbox"
+                checked={kart.visGruppenavn !== false}
+                onChange={(e) => endreKart((k) => ({ ...k, visGruppenavn: e.target.checked }))}
+              />
+              Vis gruppenavn
+            </label>
+            <Utskriftsknapp tekst="Skriv ut klassekart" onSkrivUt={utskrift.skrivUt} />
+          </Verktoygruppe>
         </div>
 
         <p className="status" role="status">
@@ -420,6 +441,7 @@ export default function Klassekart({ data, endre }) {
             <span> · {ikkePlassert} ikke plassert ennå</span>
           )}
           {visRoller && ferie && <span> · Ferie denne uka, rollene vises ikke</span>}
+          <span className="dempet lagres"> Endringer lagres automatisk.</span>
         </p>
       </section>
 
