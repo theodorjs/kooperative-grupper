@@ -116,9 +116,8 @@ export default function Rolleoversikt({ data, endre, gaTil }) {
           <button type="button" onClick={() => window.print()} disabled={Boolean(ferie)}>
             <Ikon navn="skriver" /> Skriv ut rolleoversikt
           </button>
-          <span className="dempet liten">
-            Bygger på klassekartet «{kart.navn}». Rotasjonen er ikke riktig?
-          </span>
+          <span className="dempet liten">Bygger på klassekartet «{kart.navn}».</span>
+          <span className="liten">Juster rotasjonen:</span>
           <button type="button" onClick={() => juster(-1)}>
             Én uke tilbake
           </button>
