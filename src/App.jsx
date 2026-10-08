@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { brukImporterteFerier, hentImporterteFerier } from './data/ferieimport.js';
 import { lesData, skrivData } from './data/lagring.js';
+import Bunntekst from './komponenter/Bunntekst.jsx';
 import Elevlister from './komponenter/Elevlister.jsx';
 import Innstillinger from './komponenter/Innstillinger.jsx';
 import Klassekart from './komponenter/Klassekart.jsx';
@@ -86,6 +87,8 @@ export default function App() {
         {harElever && fane === 'roller' && <Rollene data={data} endre={endre} />}
         {harElever && fane === 'innstillinger' && <Innstillinger data={data} endre={endre} erstatt={erstatt} />}
       </main>
+
+      <Bunntekst />
     </div>
   );
 }

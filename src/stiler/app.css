@@ -120,6 +120,35 @@ p {
   padding: 1rem;
 }
 
+/* Siden fyller minst hele vinduet, så bunnteksten ligger nederst også på korte sider. */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app > .side {
+  width: 100%;
+}
+
+/* Bunntekst: til stede, men lite synlig */
+.bunntekst {
+  margin-top: auto;
+  max-width: 1400px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1.5rem 1rem 1.25rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--dempet);
+  opacity: 0.8;
+}
+
+.bunntekst a {
+  color: inherit;
+}
+
 /* ---------- Felles elementer ---------- */
 
 .kort {
