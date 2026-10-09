@@ -158,6 +158,19 @@ describe('import av en klasse fra en kollega', () => {
     expect(kart.bordgrupper[0].plasser[0].ekstra).toBe(true);
   });
 
+  it('tar med layout og orientering gjennom fila', () => {
+    const fra = avsender();
+    const kart = fra.klassekart.find((k) => k.elevlisteId === fra.elevlister[0].id);
+    kart.oppsett = { ...kart.oppsett, 3: 'rekke', 4: 'blokk' };
+    kart.bordgrupper[0].oppsett = 'tett';
+    kart.bordgrupper[0].rotasjon = 0;
+    const ny = importer(mottaker(), sendKlasse(fra, fra.elevlister[0].id));
+    const importert = ny.klassekart.find((k) => k.elevlisteId === ny.elevlister[2].id && k.navn === kart.navn);
+    expect(importert.oppsett).toMatchObject({ 3: 'rekke', 4: 'blokk' });
+    expect(importert.bordgrupper[0].oppsett).toBe('tett');
+    expect(importert.bordgrupper[0].rotasjon).toBe(0);
+  });
+
   it('hopper over klassekart som ikke hører til en klasse i fila', () => {
     const fra = avsender();
     const fil = structuredClone(klasseTilDeling(fra, fra.elevlister[0].id));
