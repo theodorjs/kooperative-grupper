@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { delEllerLastNed, delingsfilnavn, filnavnDel, klasseTilDeling } from './deling.js';
+import { delEllerLastNed, delingsfilnavn, filnavnDel, KLASSEFIL, klasseTilDeling } from './deling.js';
 import { tolkImportfil } from './import.js';
-import { backupfilnavn, lagDatafil, normaliser } from './lagring.js';
+import { backupfilnavn, DataFeil, lagDatafil, normaliser, tolkImport } from './lagring.js';
 import { dupliserKlassekart, opprettElevliste } from './operasjoner.js';
 import { lagStandarddata } from './standarddata.js';
 
@@ -35,13 +35,25 @@ describe('klassefil', () => {
   it('inneholder bare den valgte klassen og klassekartene dens', () => {
     const data = toKlasser();
     const liste = data.elevlister[0];
-    const fil = klasseTilDeling(data, liste.id);
-    expect(fil.elevlister).toEqual([liste]);
-    expect(fil.klassekart).toHaveLength(2);
-    expect(fil.klassekart.every((k) => k.elevlisteId === liste.id)).toBe(true);
-    expect(fil.roller).toEqual(data.roller);
-    expect(Object.keys(fil.innstillinger).sort()).toEqual(['rom', 'rotasjonsroller']);
+    const { klasse } = klasseTilDeling(data, liste.id);
+    expect(klasse.elevlister).toEqual([liste]);
+    expect(klasse.klassekart).toHaveLength(2);
+    expect(klasse.klassekart.every((k) => k.elevlisteId === liste.id)).toBe(true);
+    expect(klasse.roller).toEqual(data.roller);
+    expect(Object.keys(klasse.innstillinger).sort()).toEqual(['rom', 'rotasjonStart', 'rotasjonsroller']);
+    expect(klasse.innstillinger.rotasjonStart).toBe(data.innstillinger.rotasjonStart);
     expect(klasseTilDeling(data, 'finnes-ikke')).toBeNull();
+  });
+
+  it('avvises av eldre versjoner av appen i stedet for å leses som en backup', () => {
+    const data = toKlasser();
+    const fil = JSON.parse(JSON.stringify(klasseTilDeling(data, data.elevlister[0].id)));
+    expect(Object.keys(fil).sort()).toEqual(['innhold', 'klasse', 'versjon']);
+    expect(fil).not.toHaveProperty('elevlister');
+    expect(fil).not.toHaveProperty('klassekart');
+    // Eldre versjoner leste fila med tolkImport, altså normaliser() uten utpakking.
+    expect(() => normaliser(fil)).toThrow(DataFeil);
+    expect(() => tolkImport(JSON.stringify(fil))).toThrow('Filen mangler elevlister eller klassekart.');
   });
 
   it('kan leses av importen og merkes som en delt klasse', async () => {
@@ -51,8 +63,24 @@ describe('klassefil', () => {
     const lest = tolkImportfil(await fil.text());
     expect(lest.erBackup).toBe(false);
     expect(lest.data.elevlister.map((l) => l.navn)).toEqual(['7B']);
-    expect(() => normaliser(klasseTilDeling(data, data.elevlister[0].id))).not.toThrow();
+    expect(lest.data.klassekart.map((k) => k.elevlisteId)).toEqual([data.elevlister[1].id]);
+    expect(lest.data.innstillinger.rotasjonStart).toBe(data.innstillinger.rotasjonStart);
     expect(tolkImportfil(JSON.stringify(data)).erBackup).toBe(true);
+  });
+
+  it('leser også en klassefil med klassen på toppnivå som en delt klasse', () => {
+    const data = toKlasser();
+    const { klasse, ...resten } = klasseTilDeling(data, data.elevlister[1].id);
+    const lest = tolkImportfil(JSON.stringify({ ...resten, ...klasse }));
+    expect(lest.erBackup).toBe(false);
+    expect(lest.data.elevlister.map((l) => l.navn)).toEqual(['7B']);
+  });
+
+  it('avviser en klassefil uten klasse', () => {
+    for (const klasse of [undefined, null, 'tekst']) {
+      expect(() => tolkImportfil(JSON.stringify({ versjon: 1, innhold: KLASSEFIL, klasse }))).toThrow(DataFeil);
+    }
+    expect(() => tolkImportfil('null')).toThrow(DataFeil);
   });
 });
 

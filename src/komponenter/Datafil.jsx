@@ -88,8 +88,10 @@ export function BackupKnapp({ data, children }) {
 /**
  * Leser en fil lokalt og legger klassene i den inn som nye klasser, etter
  * bekreftelse. Uten klasser fra før (startsiden) legges fila inn uten spørsmål.
+ * Med onImportert vises bekreftelsen av App, så den ikke forsvinner med
+ * startsiden.
  */
-export function ImportKnapp({ data, endre, children }) {
+export function ImportKnapp({ data, endre, onImportert, children }) {
   const filvelger = useRef(null);
   const [feil, setFeil] = useState(null);
   const [melding, setMelding] = useState(null);
@@ -107,8 +109,9 @@ export function ImportKnapp({ data, endre, children }) {
         return;
       }
       if (data.elevlister.length > 0 && !window.confirm(importsporsmal(data, importert))) return;
+      const ferdig = importmelding(data, importert, { erBackup });
       endre((d) => slaSammen(d, importert, { erBackup }));
-      setMelding(importmelding(importert));
+      (onImportert ?? setMelding)(ferdig);
     } catch (err) {
       setFeil(err instanceof DataFeil ? err.message : 'Kunne ikke lese filen.');
     }

@@ -9,6 +9,7 @@ import {
   opprettElevliste,
 } from './operasjoner.js';
 import { lagStandarddata } from './standarddata.js';
+import { ukeforskyvning } from '../logikk/roller.js';
 import { tilfeldigFordeling } from '../logikk/tildeling.js';
 
 const navn = (n, prefiks = 'Elev') => Array.from({ length: n }, (_, i) => `${prefiks} ${i + 1}`);
@@ -42,6 +43,8 @@ function avsender() {
 
 /** Slik importen ser fila: gjennom JSON og normaliser(). */
 const sendKlasse = (data, listeId) => tolkImportfil(JSON.stringify(klasseTilDeling(data, listeId)));
+/** Innholdet i klassefila, uten normaliser(), for å kunne endre det i testene. */
+const klassefil = (data, listeId) => structuredClone(klasseTilDeling(data, listeId).klasse);
 const sendBackup = (data) => tolkImportfil(JSON.stringify(data));
 const importer = (mottakerData, fil) => slaSammen(mottakerData, fil.data, { erBackup: fil.erBackup });
 
@@ -129,7 +132,7 @@ describe('import av en klasse fra en kollega', () => {
 
   it('flytter grupper som står utenfor rommet, inn i rommet', () => {
     const fra = avsender();
-    const fil = structuredClone(klasseTilDeling(fra, fra.elevlister[0].id));
+    const fil = klassefil(fra, fra.elevlister[0].id);
     const grupper = fil.klassekart[0].bordgrupper;
     Object.assign(grupper[0], { x: 11.5, y: 13 });
     Object.assign(grupper[1], { x: -2, y: 4 });
@@ -147,7 +150,7 @@ describe('import av en klasse fra en kollega', () => {
 
   it('tar vare på felt importen ikke kjenner', () => {
     const fra = avsender();
-    const fil = structuredClone(klasseTilDeling(fra, fra.elevlister[0].id));
+    const fil = klassefil(fra, fra.elevlister[0].id);
     fil.klassekart[0].oppsett = { 4: 'rekke' };
     fil.klassekart[0].bordgrupper[0].oppsett = 'rekke';
     fil.klassekart[0].bordgrupper[0].plasser[0].ekstra = true;
@@ -173,7 +176,7 @@ describe('import av en klasse fra en kollega', () => {
 
   it('hopper over klassekart som ikke hører til en klasse i fila', () => {
     const fra = avsender();
-    const fil = structuredClone(klasseTilDeling(fra, fra.elevlister[0].id));
+    const fil = klassefil(fra, fra.elevlister[0].id);
     fil.klassekart.push({ ...fil.klassekart[0], id: 'foreldreloest', elevlisteId: 'finnes-ikke' });
     const til = mottaker();
     const ny = slaSammen(til, fil);
@@ -224,6 +227,74 @@ describe('klasse med samme navn', () => {
     expect(ny.elevlister[1]).toEqual(til.elevlister[1]);
     expect(aktivElevliste(ny).navn).toBe(' 7a ');
   });
+
+  /** Antall elever i hver klasse, så klasser med samme navn kan skilles. */
+  const klasser = (data) => data.elevlister.map((l) => `${l.navn} (${l.elever.length})`);
+
+  it('erstatter bare én av to egne klasser med samme navn', () => {
+    // «Ny elevliste» er standardnavnet når navnefeltet står tomt.
+    let til = medKlasse(lagStandarddata('2026-10-07'), 'Ny elevliste', navn(20));
+    til = medKlasse(til, 'Ny elevliste', navn(18, 'Eik'));
+    til = medKlasse(til, '7C', navn(21, 'Selje'));
+    const bevart = til.elevlister[1];
+    const fra = medKlasse(lagStandarddata('2026-10-07'), 'Ny elevliste', navn(5, 'Ask'));
+    const fil = sendKlasse(fra, fra.elevlister[0].id);
+
+    expect(navnekollisjoner(til, fil.data)).toEqual(['Ny elevliste']);
+    expect(importsporsmal(til, fil.data)).toBe(
+      'Du har allerede en klasse som heter «Ny elevliste» (20 elever). Den blir overskrevet av klassen fra fila, med ' +
+        'elever og klassekart. Vil du fortsette?',
+    );
+    const ny = importer(til, fil);
+    expect(klasser(ny)).toEqual(['Ny elevliste (5)', 'Ny elevliste (18)', '7C (21)']);
+    expect(ny.elevlister[1]).toEqual(bevart);
+    expect(klassekartForListe(ny, bevart.id)).toEqual(klassekartForListe(til, bevart.id));
+    expect(ny.klassekart.some((k) => k.elevlisteId === til.elevlister[0].id)).toBe(false);
+  });
+
+  it('erstatter den første av «7A» og «7a» og lar den andre stå', () => {
+    let til = medKlasse(lagStandarddata('2026-10-07'), '7A', navn(21));
+    til = medKlasse(til, '7a', navn(19, 'Lind'));
+    const fra = medKlasse(lagStandarddata('2026-10-07'), '7A', navn(4, 'Ask'));
+    const ny = importer(til, sendKlasse(fra, fra.elevlister[0].id));
+    expect(klasser(ny)).toEqual(['7A (4)', '7a (19)']);
+    expect(ny.elevlister[1]).toEqual(til.elevlister[1]);
+    expect(klassekartForListe(ny, til.elevlister[1].id)).toEqual(klassekartForListe(til, til.elevlister[1].id));
+  });
+
+  it('legger inn den andre av to klasser med samme navn i fila som ny klasse', () => {
+    const til = mottaker();
+    const fra = medKlasse(medKlasse(lagStandarddata('2026-10-07'), '7A', navn(5, 'Ask')), '7A', navn(6, 'Eik'));
+    const fil = sendBackup(fra);
+
+    expect(navnekollisjoner(til, fil.data)).toEqual(['7A']);
+    expect(importsporsmal(til, fil.data)).toBe(
+      'Du har allerede en klasse som heter «7A». Den blir overskrevet av klassen fra fila, med elever og klassekart. ' +
+        '«7A» (6 elever) legges inn som ny klasse. Vil du fortsette?',
+    );
+    expect(importmelding(til, fil.data, { erBackup: true })).toBe(
+      'Klassene «7A» (5 elever) og «7A» (6 elever) er lagt inn.',
+    );
+    const ny = importer(til, fil);
+    expect(klasser(ny)).toEqual(['7A (5)', '7B (12)', '7A (6)']);
+
+    // Neste import av «7A» erstatter igjen bare én av dem.
+    const enTil = medKlasse(lagStandarddata('2026-10-07'), '7A', navn(3, 'Gran'));
+    expect(klasser(importer(ny, sendKlasse(enTil, enTil.elevlister[0].id)))).toEqual(['7A (3)', '7B (12)', '7A (6)']);
+  });
+
+  it('erstatter to egne klasser med samme navn når fila har to', () => {
+    let til = medKlasse(lagStandarddata('2026-10-07'), '7A', navn(21));
+    til = medKlasse(til, '7A', navn(18, 'Eik'));
+    const fra = medKlasse(medKlasse(lagStandarddata('2026-10-07'), '7A', navn(5, 'Ask')), '7a', navn(6, 'Lind'));
+    const fil = sendBackup(fra);
+    expect(navnekollisjoner(til, fil.data)).toEqual(['7A', '7A']);
+    expect(importsporsmal(til, fil.data)).toBe(
+      'Du har allerede klasser som heter «7A» (21 elever) og «7A» (18 elever). De blir overskrevet av klassene fra ' +
+        'fila, med elever og klassekart. Vil du fortsette?',
+    );
+    expect(klasser(importer(til, fil))).toEqual(['7A (5)', '7a (6)']);
+  });
 });
 
 describe('import av en backup', () => {
@@ -239,9 +310,35 @@ describe('import av en backup', () => {
     const tom = lagStandarddata('2026-10-07');
     const ny = importer(tom, sendKlasse(fra, fra.elevlister[0].id));
     expect(ny.elevlister.map((l) => l.navn)).toEqual(['8C']);
-    expect(ny.roller).toEqual(tom.roller);
-    expect(ny.innstillinger.rom).toEqual(tom.innstillinger.rom);
     expect(aktivtKlassekart(ny).navn).toBe('Etter jul');
+    // Ferier og resten av innstillingene er mottakerens.
+    expect(ny.innstillinger.ferier).toEqual(tom.innstillinger.ferier);
+    expect(ny.innstillinger.ferieimport).toEqual(tom.innstillinger.ferieimport);
+    expect(ny.innstillinger.onsketGruppestorrelse).toBe(tom.innstillinger.onsketGruppestorrelse);
+  });
+
+  it('tar rommet, rollene og rotasjonen fra klassefila når mottakeren ikke har klasser', () => {
+    const fra = avsender();
+    const ny = importer(lagStandarddata('2026-10-07'), sendKlasse(fra, fra.elevlister[0].id));
+    expect(ny.roller).toEqual(fra.roller);
+    expect(ny.innstillinger.rom).toEqual(fra.innstillinger.rom);
+    expect(ny.innstillinger.rotasjonStart).toBe(fra.innstillinger.rotasjonStart);
+    expect(ny.innstillinger.rotasjonsroller).toEqual(fra.innstillinger.rotasjonsroller);
+    // Elevene får de samme rollene samme uke som hos kollegaen.
+    expect(ukeforskyvning(ny.innstillinger.rotasjonStart, '2026-10-09')).toBe(
+      ukeforskyvning(fra.innstillinger.rotasjonStart, '2026-10-09'),
+    );
+  });
+
+  it('flytter ikke grupper inn i et mindre rom når mottakeren ikke har klasser', () => {
+    const fra = avsender();
+    fra.innstillinger.rom = { bredde: 14, lengde: 14 };
+    const kart = fra.klassekart.find((k) => k.elevlisteId === fra.elevlister[0].id);
+    Object.assign(kart.bordgrupper[0], { x: 11.67, y: 11.55 });
+    const ny = importer(lagStandarddata('2026-10-07'), sendKlasse(fra, fra.elevlister[0].id));
+    const importert = klassekartForListe(ny, ny.elevlister[0].id).find((k) => k.navn === kart.navn);
+    expect(importert.bordgrupper.map((g) => [g.x, g.y])).toEqual(kart.bordgrupper.map((g) => [g.x, g.y]));
+    expect(ny.innstillinger.rom).toEqual({ bredde: 14, lengde: 14 });
   });
 
   it('legger alle klassene i en backup inn hos en som har klasser fra før', () => {
@@ -273,8 +370,16 @@ describe('tekster', () => {
     expect(importsporsmal(mottaker(), flere)).toBe(
       'Fila inneholder 2 klasser: «5A» og «5B». De legges inn som nye klasser.',
     );
-    expect(importmelding(fil)).toBe('Klassen «8C» er lagt inn.');
-    expect(importmelding(flere)).toBe('Klassene «5A» og «5B» er lagt inn.');
+    expect(importmelding(mottaker(), fil)).toBe('Klassen «8C» er lagt inn.');
+    expect(importmelding(mottaker(), flere, { erBackup: true })).toBe('Klassene «5A» og «5B» er lagt inn.');
+    expect(importmelding(lagStandarddata(), fil)).toBe('Klassen «8C» er lagt inn.');
+  });
+
+  it('sier fra når en backup er lest inn på startsiden', () => {
+    const backup = sendBackup(mottaker());
+    expect(importmelding(lagStandarddata(), backup.data, { erBackup: backup.erBackup })).toBe(
+      'Backupen er lest inn: «7A» og «7B», med roller og innstillinger.',
+    );
   });
 
   it('advarer når en klasse blir overskrevet', () => {

@@ -29,8 +29,10 @@ export function delingsfilnavn(klassenavn, dato = iDag()) {
 }
 
 /**
- * Én klasse (elevlista og klassekartene som hører til) i det vanlige
- * dataformatet. Rollebiblioteket følger med, så fila kan leses som vanlig.
+ * Én klasse (elevlista og klassekartene som hører til), med rollene, rommet
+ * og rotasjonen. Klassen ligger under «klasse», ikke på toppnivå: eldre
+ * versjoner av appen ville ellers lest fila som en backup og erstattet alle
+ * klassene. Nå avviser de fila. Importen pakker den ut (se import.js).
  */
 export function klasseTilDeling(data, listeId) {
   const liste = data.elevlister.find((l) => l.id === listeId);
@@ -38,12 +40,15 @@ export function klasseTilDeling(data, listeId) {
   return {
     versjon: DATAVERSJON,
     innhold: KLASSEFIL,
-    elevlister: [liste],
-    klassekart: klassekartForListe(data, listeId),
-    roller: data.roller,
-    innstillinger: {
-      rom: data.innstillinger.rom,
-      rotasjonsroller: data.innstillinger.rotasjonsroller,
+    klasse: {
+      elevlister: [liste],
+      klassekart: klassekartForListe(data, listeId),
+      roller: data.roller,
+      innstillinger: {
+        rom: data.innstillinger.rom,
+        rotasjonStart: data.innstillinger.rotasjonStart,
+        rotasjonsroller: data.innstillinger.rotasjonsroller,
+      },
     },
   };
 }

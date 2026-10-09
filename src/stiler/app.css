@@ -1518,6 +1518,23 @@ legend {
   background: var(--aksent-lys);
 }
 
+/* Bekreftelsen etter en import, øverst på siden, med «Lukk» */
+.varsel.importmelding {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+
+.importmelding .lenkeknapp {
+  flex-shrink: 0;
+  min-height: 44px;
+  font-size: inherit;
+}
+
 @media (max-width: 600px) {
   .datavalg {
     grid-template-columns: 1fr;

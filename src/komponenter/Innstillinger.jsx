@@ -143,7 +143,7 @@ function Ferier({ ferier, onEndre }) {
   );
 }
 
-export default function Innstillinger({ data, endre }) {
+export default function Innstillinger({ data, endre, onImportert }) {
   const inn = data.innstillinger;
   const sett = (endring) => endre((d) => oppdaterInnstillinger(d, endring));
   const idag = iDag();
@@ -271,8 +271,9 @@ export default function Innstillinger({ data, endre }) {
             Alle klasser, roller og innstillinger i én fil. I en ny nettleser får du alt tilbake med «Importer fra fil»
             på startsiden.
           </BackupKnapp>
-          <ImportKnapp data={data} endre={endre}>
-            Klassene i fila legges inn som nye klasser. Dine andre klasser blir ikke endret.
+          <ImportKnapp data={data} endre={endre} onImportert={onImportert}>
+            Klassene i fila legges inn som nye klasser. Dine andre klasser, roller og innstillinger blir ikke
+            endret.
           </ImportKnapp>
         </div>
         <p className="dempet liten">

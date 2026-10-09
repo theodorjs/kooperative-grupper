@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { opprettElevliste, tolkNavneliste } from '../data/operasjoner.js';
 import { ImportKnapp } from './Datafil.jsx';
 
-export default function Oppstart({ data, endre, onFerdig }) {
+export default function Oppstart({ data, endre, onFerdig, onImportert }) {
   const [listenavn, setListenavn] = useState('');
   const [tekst, setTekst] = useState('');
   const navn = tolkNavneliste(tekst);
@@ -45,7 +45,7 @@ export default function Oppstart({ data, endre, onFerdig }) {
             Lag elevliste{navn.length > 0 ? ` med ${navn.length} ${navn.length === 1 ? 'elev' : 'elever'}` : ''}
           </button>
           <span className="dempet">eller</span>
-          <ImportKnapp data={data} endre={endre} />
+          <ImportKnapp data={data} endre={endre} onImportert={onImportert} />
         </div>
       </form>
     </section>

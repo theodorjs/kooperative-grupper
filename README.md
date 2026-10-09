@@ -41,10 +41,15 @@ Klassekart og rolleoversikt kan skrives ut eller lagres som PDF.
    (elevlista med klassekartene) gjennom delingsmenyen på iPad. Har du flere klasser, velger du hvilken. Kollegaen
    lagrer fila og trykker **Importer fra fil** i appen. Klassene i fila legges inn som nye klasser, og de andre
    klassene blir ikke endret. Finnes det fra før en klasse med samme navn, blir den overskrevet, men først kommer en
-   advarsel. Roller, rotasjon, ferier og rom er mottakerens egne. Grupper som står utenfor mottakerens rom, flyttes
-   inn. Der delingsmenyen ikke finnes (for eksempel i Chrome på PC), lastes fila ned i stedet.
+   advarsel. Hver klasse i fila overskriver høyst én klasse: har du to med samme navn, blir den første overskrevet og
+   den andre stående. Har kollegaen klasser fra før, er roller, rotasjon, ferier og rom kollegaens egne, og grupper
+   som står utenfor rommet, flyttes inn. Legges klassen inn fra startsiden (uten klasser), følger rommet, rollene og
+   rotasjonen med fra fila, så elevene får de samme rollene som hos deg. Der delingsmenyen ikke finnes (for eksempel
+   i Chrome på PC), lastes fila ned i stedet. Eldre versjoner av appen kan ikke lese klassefila, og avviser den i
+   stedet for å lese den som en backup.
 7. **Backup:** **Last ned en backup** lagrer alle klasser, roller og innstillinger i én fil. I en ny nettleser (uten
-   klasser) gir **Importer fra fil** på startsiden alt tilbake slik det var.
+   klasser) gir **Importer fra fil** på startsiden alt tilbake slik det var, uten spørsmål, og appen sier fra når
+   backupen er lest inn. Hos en som har klasser fra før, legges klassene i backupen inn som nye klasser.
 
 Standardrollene (fra plakatene) står i `src/logikk/rollebibliotek.js`. Hvordan rollene slås sammen i små grupper,
 står i `src/logikk/roller.js`.
