@@ -3,6 +3,7 @@ import { FERIEKILDE, settFerieimport } from '../data/ferieimport.js';
 import { brukFargetema, lagreFargetema, lesFargetema } from '../data/fargetema.js';
 import { nyId } from '../data/id.js';
 import { oppdaterInnstillinger } from '../data/operasjoner.js';
+import { aktivSkole } from '../data/skoletema.js';
 import { flyttRotasjonStart } from '../logikk/roller.js';
 import { erGyldigDato, formaterDato, iDag, mandagForDato, ukeoverskrift } from '../logikk/uke.js';
 import { EksportKnapp, ImportKnapp } from './Datafil.jsx';
@@ -38,6 +39,7 @@ const FARGEVALG = [
 
 function Fargevalg() {
   const [valgt, setValgt] = useState(lesFargetema);
+  const skole = aktivSkole();
 
   function velg(valg) {
     setValgt(valg);
@@ -58,6 +60,7 @@ function Fargevalg() {
       <p className="dempet liten fargevalg-hjelp">
         Automatisk følger innstillingen på maskinen. Valget gjelder bare denne nettleseren. Utskrifter blir alltid lyse.
       </p>
+      {skole && <p className="dempet liten fargevalg-hjelp">Fargene følger {skole.navn}.</p>}
     </section>
   );
 }

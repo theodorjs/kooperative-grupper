@@ -41,6 +41,14 @@ står i `src/logikk/roller.js`.
 den nettleseren, og utskrifter blir alltid lyse. Fargene kommer fra fargesystemet i «Min bruksanvisning» og ligger i
 `src/stiler/farger.css`.
 
+**Skolefarger:** På Torderød skoles adresse (https://torderodskole.no/cc/) bruker appen skolens farger: dyp rød for
+knapper og lenker, oker som andrefarge og varme, lyse flater. Skolefargene har både lys og mørk variant, så fargevalget
+virker som før, og utskrifter blir lyse. Andre steder brukes de vanlige fargene. Legg til `?skole=torderod` i adressen
+for å se skolefargene, eller `?skole=ingen` for å slå dem av (valget lagres ikke). Under **Innstillinger → Fargevalg**
+står det når skolefargene er i bruk. Skolene står i `src/data/skoletema.js` og i en liten tabell i `index.html`,
+fargene i `src/stiler/skoler.css`. Testene sjekker at tabellene er like, at de to mørke blokkene er like, og at teksten
+har god nok kontrast.
+
 ## Ferier fra skoleruta til Moss kommune
 
 Feriene hentes automatisk fra
@@ -72,13 +80,14 @@ Kildekoden er organisert slik:
 - `scripts/` – henting av ferier fra kommunen (kjøres av GitHub Actions).
 - `src/data/` – lagring, eksport/import og operasjoner på appdataene.
 - `src/komponenter/` – React-komponentene. Klassekartet tegnes som SVG.
-- `src/stiler/` – fargesystemet (`farger.css`) og stiler for skjerm og utskrift.
+- `src/stiler/` – fargesystemet (`farger.css`), skolefarger (`skoler.css`) og stiler for skjerm og utskrift.
 
 ## Publisering på GitHub Pages
 
 Arbeidsflyten `.github/workflows/publiser.yml` tester, henter ferier, bygger og publiserer appen ved hver push til
 `main` og hver mandag morgen.
 Første gang må Pages slås på: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-Appen ligger på https://theodorjs.github.io/kooperative-grupper/.
+Appen ligger på https://theodorjs.github.io/kooperative-grupper/. Torderød skole bygger den samme koden og legger den
+på https://torderodskole.no/cc/, der skolefargene slås på automatisk.
 
 `vite.config.js` bruker relativ `base` (`./`), så appen virker uansett hva repoet heter.

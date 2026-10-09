@@ -49,6 +49,9 @@
   --bk-tabellkant-sterk: #1F2937;
   --bk-tabellkant: #6B7280;
 
+  /* Streken under toppfeltet. Skolefargene (skoler.css) kan gi den egen farge. */
+  --bk-toppkant: var(--bk-line);
+
   --bk-skygge: 0 1px 2px rgb(0 0 0 / 6%), 0 1px 6px rgb(0 0 0 / 4%);
 }
 

@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import './stiler/farger.css';
+import './stiler/skoler.css';
 import './stiler/app.css';
 import './stiler/print.css';
 
