@@ -1466,6 +1466,74 @@ legend {
   margin: 0.6rem 0 0;
 }
 
+/* Data og personvern: knappen til venstre, forklaringen til høyre */
+.datavalg {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  gap: 0.9rem 1.25rem;
+  margin: 1rem 0;
+}
+
+.datavalg-rad {
+  display: contents;
+}
+
+.datavalg button {
+  min-height: 44px;
+  padding: 0.5rem 0.9rem;
+  gap: 0.5rem;
+}
+
+/* Med klassevelger står knappen på linje med velgeren, ikke midt på forklaringen. */
+.datavalg-rad.med-valg > button {
+  align-self: start;
+}
+
+.datavalg-hjelp p {
+  margin: 0;
+}
+
+.datavalg-klasse {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.datavalg-klasse select {
+  min-height: 44px;
+}
+
+.datavalg .varsel {
+  grid-column: 1 / -1;
+  margin: -0.3rem 0 0;
+  font-size: 0.9rem;
+}
+
+.varsel.ok {
+  background: var(--aksent-lys);
+}
+
+@media (max-width: 600px) {
+  .datavalg {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .datavalg button {
+    justify-self: start;
+  }
+
+  .datavalg-hjelp {
+    margin-bottom: 0.6rem;
+  }
+}
+
 /* Vises bare ved utskrift */
 .kun-utskrift {
   display: none;

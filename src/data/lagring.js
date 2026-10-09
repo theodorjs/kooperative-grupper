@@ -168,29 +168,40 @@ export function skrivData(data, lager = standardLager()) {
   }
 }
 
-export function eksportfilnavn(dato = iDag()) {
-  return `kooperative-grupper-${dato}.json`;
+export function backupfilnavn(dato = iDag()) {
+  return `kooperative-grupper-backup-${dato}.json`;
 }
 
-/** Laster ned alle data som en JSON-fil. Skjer helt lokalt i nettleseren. */
-export function lastNedData(data) {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+/** Lager en JSON-fil av dataene, klar til å lastes ned eller deles. */
+export function lagDatafil(data, filnavn) {
+  return new File([JSON.stringify(data, null, 2)], filnavn, { type: 'application/json' });
+}
+
+/** Laster ned en fil. Skjer helt lokalt i nettleseren. */
+export function lastNedFil(fil) {
+  const url = URL.createObjectURL(fil);
   const lenke = document.createElement('a');
   lenke.href = url;
-  lenke.download = eksportfilnavn();
+  lenke.download = fil.name;
   document.body.appendChild(lenke);
   lenke.click();
   lenke.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function tolkImport(tekstinnhold) {
-  let parsed;
+/** Laster ned alle data som en backup. */
+export function lastNedBackup(data) {
+  lastNedFil(lagDatafil(data, backupfilnavn()));
+}
+
+export function lesJson(tekstinnhold) {
   try {
-    parsed = JSON.parse(tekstinnhold);
+    return JSON.parse(tekstinnhold);
   } catch {
     throw new DataFeil('Filen er ikke en gyldig JSON-fil.');
   }
-  return normaliser(parsed);
+}
+
+export function tolkImport(tekstinnhold) {
+  return normaliser(lesJson(tekstinnhold));
 }

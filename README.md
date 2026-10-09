@@ -10,9 +10,9 @@ Klassekart og rolleoversikt kan skrives ut eller lagres som PDF.
 - Elevnavn ligger aldri i koden eller i repoet. Elevlisten limes inn i appen og lagres bare i nettleseren
   (`localStorage`).
 - Appen sender ingenting over nettet: ingen analyse, ingen eksterne fonter, ingen API-kall.
-- Under **Innstillinger** kan du laste ned alle data som en JSON-fil (sikkerhetskopi) og importere dem i en annen
-  nettleser. Filen inneholder elevnavn – ikke legg den i repoet. `.gitignore` stopper filer med standardnavnet
-  `kooperative-grupper-*.json`.
+- Under **Innstillinger** kan du sende én klasse til en kollega med AirDrop, eller laste ned en backup med alle data
+  som en JSON-fil. Filene inneholder elevnavn – send dem bare direkte til kolleger, og ikke legg dem i repoet.
+  `.gitignore` stopper filer med standardnavnet `kooperative-grupper-*.json`.
 
 ## Bruk
 
@@ -37,6 +37,14 @@ Klassekart og rolleoversikt kan skrives ut eller lagres som PDF.
 5. **Rollene:** biblioteket over samarbeidsrollene, som kort med ikon, navn og beskrivelse. Legg til nye roller,
    endre eller slett dem. Øverst velger du hvilke fire roller som brukes i rotasjonen; navn, ikon og farge vises da i
    «Denne uka» og på klassekartet. En rolle som står i rotasjonen, må byttes ut før den kan slettes.
+6. **Dele med en kollega:** under **Innstillinger → Data og personvern** sender **AirDrop til en kollega** én klasse
+   (elevlista med klassekartene) gjennom delingsmenyen på iPad. Har du flere klasser, velger du hvilken. Kollegaen
+   lagrer fila og trykker **Importer fra fil** i appen. Klassene i fila legges inn som nye klasser, og de andre
+   klassene blir ikke endret. Finnes det fra før en klasse med samme navn, blir den overskrevet, men først kommer en
+   advarsel. Roller, rotasjon, ferier og rom er mottakerens egne. Grupper som står utenfor mottakerens rom, flyttes
+   inn. Der delingsmenyen ikke finnes (for eksempel i Chrome på PC), lastes fila ned i stedet.
+7. **Backup:** **Last ned en backup** lagrer alle klasser, roller og innstillinger i én fil. I en ny nettleser (uten
+   klasser) gir **Importer fra fil** på startsiden alt tilbake slik det var.
 
 Standardrollene (fra plakatene) står i `src/logikk/rollebibliotek.js`. Hvordan rollene slås sammen i små grupper,
 står i `src/logikk/roller.js`.
@@ -84,7 +92,8 @@ Kildekoden er organisert slik:
 - `src/logikk/` – rene funksjoner uten React, med tester: gruppestørrelser, pultmaler og layouter, orientering,
   tildeling, roller, ukenummer og tolkning av skolerute.
 - `scripts/` – henting av ferier fra kommunen (kjøres av GitHub Actions).
-- `src/data/` – lagring, eksport/import og operasjoner på appdataene.
+- `src/data/` – lagring, deling av en klasse (`deling.js`), import som legger til klasser (`import.js`) og
+  operasjoner på appdataene.
 - `src/komponenter/` – React-komponentene. Klassekartet tegnes som SVG.
 - `src/stiler/` – fargesystemet (`farger.css`), skolefarger (`skoler.css`) og stiler for skjerm og utskrift.
 

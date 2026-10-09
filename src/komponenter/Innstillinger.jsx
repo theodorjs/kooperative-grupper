@@ -6,7 +6,7 @@ import { oppdaterInnstillinger } from '../data/operasjoner.js';
 import { aktivSkole } from '../data/skoletema.js';
 import { flyttRotasjonStart } from '../logikk/roller.js';
 import { erGyldigDato, formaterDato, iDag, mandagForDato, ukeoverskrift } from '../logikk/uke.js';
-import { EksportKnapp, ImportKnapp } from './Datafil.jsx';
+import { BackupKnapp, DelKlasseKnapp, ImportKnapp } from './Datafil.jsx';
 
 function Tallfelt({ verdi, min, max, steg, onEndre, ...rest }) {
   const [utkast, setUtkast] = useState(String(verdi));
@@ -143,7 +143,7 @@ function Ferier({ ferier, onEndre }) {
   );
 }
 
-export default function Innstillinger({ data, endre, erstatt }) {
+export default function Innstillinger({ data, endre }) {
   const inn = data.innstillinger;
   const sett = (endring) => endre((d) => oppdaterInnstillinger(d, endring));
   const idag = iDag();
@@ -261,16 +261,23 @@ export default function Innstillinger({ data, endre, erstatt }) {
 
       <section className="kort">
         <h2>Data og personvern</h2>
-        <p>
-          Alt lagres bare i denne nettleseren på denne maskinen. Appen sender ingenting over nettet. Last ned data for å
-          ta sikkerhetskopi, eller for å flytte til en annen maskin eller nettleser.
-        </p>
-        <div className="knapperad">
-          <EksportKnapp data={data} />
-          <ImportKnapp erstatt={erstatt} harData />
+        <p>Alt lagres bare i denne nettleseren på denne maskinen. Appen sender ingenting over nettet.</p>
+        <div className="datavalg">
+          <DelKlasseKnapp data={data}>
+            Sender én klasse med elever og klassekart til en kollegas iPad. Kollegaen lagrer fila og velger «Importer
+            fra fil» i appen.
+          </DelKlasseKnapp>
+          <BackupKnapp data={data}>
+            Alle klasser, roller og innstillinger i én fil. I en ny nettleser får du alt tilbake med «Importer fra fil»
+            på startsiden.
+          </BackupKnapp>
+          <ImportKnapp data={data} endre={endre}>
+            Klassene i fila legges inn som nye klasser. Dine andre klasser blir ikke endret.
+          </ImportKnapp>
         </div>
         <p className="dempet liten">
-          Filen inneholder elevnavn. Ikke legg den i et delt eller offentlig område.
+          Filene inneholder elevnavn. Send dem bare direkte til kolleger, og ikke legg dem i et delt eller offentlig
+          område.
         </p>
       </section>
     </div>

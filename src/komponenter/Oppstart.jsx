@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { opprettElevliste, tolkNavneliste } from '../data/operasjoner.js';
 import { ImportKnapp } from './Datafil.jsx';
 
-export default function Oppstart({ endre, erstatt, onFerdig }) {
+export default function Oppstart({ data, endre, onFerdig }) {
   const [listenavn, setListenavn] = useState('');
   const [tekst, setTekst] = useState('');
   const navn = tolkNavneliste(tekst);
@@ -22,8 +22,8 @@ export default function Oppstart({ endre, erstatt, onFerdig }) {
         og se hvem som har hvilken rolle hver uke.
       </p>
       <p className="personvern">
-        Navnene lagres bare i denne nettleseren. Ingenting sendes over nettet. Bruk «Last ned data» under Innstillinger
-        for å ta sikkerhetskopi eller flytte data til en annen maskin.
+        Navnene lagres bare i denne nettleseren. Ingenting sendes over nettet. Har du fått en klasse fra en kollega,
+        eller har du en backup, legger du den inn med «Importer fra fil».
       </p>
 
       <form onSubmit={opprett} className="skjema">
@@ -45,7 +45,7 @@ export default function Oppstart({ endre, erstatt, onFerdig }) {
             Lag elevliste{navn.length > 0 ? ` med ${navn.length} ${navn.length === 1 ? 'elev' : 'elever'}` : ''}
           </button>
           <span className="dempet">eller</span>
-          <ImportKnapp erstatt={erstatt} harData={false} tekst="Importer data fra fil" />
+          <ImportKnapp data={data} endre={endre} />
         </div>
       </form>
     </section>

@@ -27,7 +27,6 @@ export default function App() {
   }, [data]);
 
   const endre = useCallback((endring) => setData((d) => endring(d)), []);
-  const erstatt = useCallback((nyData) => setData(nyData), []);
 
   // Henter ferier fra skoleruta (fila ligger ved siden av appen, se ferieimport.js).
   const ferieimportAktiv = data.innstillinger.ferieimport.aktiv;
@@ -69,15 +68,16 @@ export default function App() {
 
       {lagringFeilet && (
         <p className="varsel feil ikke-utskrift" role="alert">
-          Kunne ikke lagre i nettleseren. Endringene dine kan gå tapt. Last ned data under Innstillinger for å ta en kopi.
+          Kunne ikke lagre i nettleseren. Endringene dine kan gå tapt. Trykk «Last ned en backup» under Innstillinger for å
+          ta en kopi.
         </p>
       )}
 
       <main className="side">
         {!harElever && (
           <Oppstart
+            data={data}
             endre={endre}
-            erstatt={erstatt}
             onFerdig={() => setFane('kart')}
           />
         )}
@@ -85,7 +85,7 @@ export default function App() {
         {harElever && fane === 'kart' && <Klassekart data={data} endre={endre} />}
         {harElever && fane === 'elever' && <Elevlister data={data} endre={endre} />}
         {harElever && fane === 'roller' && <Rollene data={data} endre={endre} />}
-        {harElever && fane === 'innstillinger' && <Innstillinger data={data} endre={endre} erstatt={erstatt} />}
+        {harElever && fane === 'innstillinger' && <Innstillinger data={data} endre={endre} />}
       </main>
 
       <Bunntekst />
