@@ -19,9 +19,13 @@ Klassekart og rolleoversikt kan skrives ut eller lagres som PDF.
 1. **Første oppstart:** lim inn elevlisten, ett navn per linje. Appen lager et klassekart med grupper etter ønsket
    gruppestørrelse (standard 4; 21 elever gir 3 grupper med 4 og 3 med 3).
 2. **Klassekart:** verktøyene øverst er samlet i fire grupper: Klassekart, Bordgrupper, Elever og Visning. Dra
-   bordgruppene dit de står i rommet. De snur seg automatisk mot tavla. Dra elever fra listen til
-   plassene, eller trykk **Tilfeldig fordeling**. Klikk på en gruppe for å endre nummer og navn, antall plasser, lang
-   arm (5-grupper), retning eller plassnummerering. **Vis gruppenavn** slår navnene på kartet av og på. En låst elev
+   bordgruppene dit de står i rommet. Med **Automatisk orientering** snur gruppene seg sånn at elevene ser mot tavla;
+   slår du den av, står alle gruppene rett, parallelt med veggene. **Ordne i rutenett** flytter gruppene tilbake
+   til rutenettet. **Layout** viser hvordan pultene står, og der velger du layout for alle gruppene med 2, 3, 4 eller
+   5 plasser i klassekartet (for eksempel med eller uten åpning, blokk eller tre på rekke). Nye klassekart får samme
+   layout. Dra elever fra listen til plassene, eller trykk **Tilfeldig fordeling**. Klikk på en gruppe for å endre
+   nummer og navn, antall plasser, layout for bare den gruppa, retning eller plassnummerering. Elevene blir sittende
+   på plassnummeret sitt når layouten byttes. **Vis gruppenavn** slår navnene på kartet av og på. En låst elev
    blir sittende ved tilfeldig fordeling. Navnene på pultene leses fra elevens side, men snus hvis de ellers ville stått
    opp ned på kartet; stolen viser hvilken vei eleven sitter.
 3. **Denne uka:** rolleoversikten. Plassnummeret er fast, rollen roterer hver mandag. Rotasjonen står stille i
@@ -36,6 +40,8 @@ Klassekart og rolleoversikt kan skrives ut eller lagres som PDF.
 
 Standardrollene (fra plakatene) står i `src/logikk/rollebibliotek.js`. Hvordan rollene slås sammen i små grupper,
 står i `src/logikk/roller.js`.
+Layoutene for bordgruppene står i `src/logikk/maler.js`. Feltet `langArm` holdes i takt med layouten, så eldre
+versjoner av appen tegner 5-gruppene riktig.
 
 **Fargevalg:** Under **Innstillinger** velger du lys, mørk eller automatisk (følger maskinen). Valget gjelder bare
 den nettleseren, og utskrifter blir alltid lyse. Fargene kommer fra fargesystemet i «Min bruksanvisning» og ligger i
@@ -75,8 +81,8 @@ npm run build    # bygger til dist/
 
 Kildekoden er organisert slik:
 
-- `src/logikk/` – rene funksjoner uten React, med tester: gruppestørrelser, pultmaler, orientering, tildeling,
-  roller, ukenummer og tolkning av skolerute.
+- `src/logikk/` – rene funksjoner uten React, med tester: gruppestørrelser, pultmaler og layouter, orientering,
+  tildeling, roller, ukenummer og tolkning av skolerute.
 - `scripts/` – henting av ferier fra kommunen (kjøres av GitHub Actions).
 - `src/data/` – lagring, eksport/import og operasjoner på appdataene.
 - `src/komponenter/` – React-komponentene. Klassekartet tegnes som SVG.

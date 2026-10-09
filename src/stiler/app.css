@@ -929,6 +929,214 @@ legend {
   font-size: 0.9rem;
 }
 
+/* ---------- Layout for bordgruppene ---------- */
+
+/* Tegningene bruker tekstfargen, så de virker i lys og mørk modus. */
+.oppsettegning {
+  display: block;
+  overflow: visible;
+}
+
+.oppsettegning-tavle {
+  fill: var(--aksent);
+}
+
+.oppsettegning-pult {
+  fill: var(--bk-pult);
+  stroke: currentColor;
+  stroke-width: 1.25;
+}
+
+.oppsettegning-stol {
+  fill: currentColor;
+  opacity: 0.3;
+}
+
+.oppsettegning-nummer {
+  font-size: 28px;
+  font-weight: 600;
+  text-anchor: middle;
+  fill: currentColor;
+}
+
+/* Knappen «Layout» i verktøylinja */
+.layoutknapp {
+  min-height: 44px;
+  padding: 0.3rem 0.8rem 0.3rem 0.45rem;
+  gap: 0.55rem;
+}
+
+.layoutknapp .oppsettegning {
+  width: 48px;
+  height: 44px;
+}
+
+/* Valgknappene med tegning */
+.oppsettvalgliste {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 0.6rem;
+}
+
+.oppsettvalg {
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.3rem;
+  min-height: 44px;
+  padding: 0.7rem 0.75rem 0.8rem;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.oppsettvalg .oppsettegning {
+  width: 112px;
+  height: auto;
+  margin-bottom: 0.2rem;
+}
+
+.oppsettvalg[aria-pressed='true'] {
+  border-color: var(--aksent);
+  box-shadow: inset 0 0 0 1px var(--aksent);
+  background: var(--aksent-lys);
+}
+
+.oppsettvalg-navn {
+  font-weight: 600;
+}
+
+.oppsettvalg-beskrivelse {
+  font-size: 0.82rem;
+  color: var(--dempet);
+  line-height: 1.35;
+}
+
+.oppsettvalgliste.kompakt {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.oppsettvalg.kompakt {
+  padding: 0.45rem 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  gap: 0.15rem;
+}
+
+.oppsettvalg.kompakt .oppsettegning {
+  width: 100%;
+  max-width: 84px;
+}
+
+.oppsettstatus {
+  margin: 0.4rem 0 0;
+}
+
+.oppsettstatus .lenkeknapp {
+  min-height: 44px;
+  font-size: inherit;
+}
+
+/* Menyen med alle layoutene */
+.oppsettmeny {
+  width: min(960px, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0;
+  border: 1px solid var(--kant);
+  border-radius: var(--radius);
+  background: var(--flate);
+  color: var(--tekst);
+  box-shadow: 0 10px 40px rgb(0 0 0 / 25%);
+}
+
+.oppsettmeny::backdrop {
+  background: rgb(15 20 28 / 45%);
+}
+
+.oppsettmeny-innhold {
+  padding: 0 1.25rem 1.25rem;
+}
+
+.oppsettmeny-topp {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 0 0.6rem;
+  background: var(--flate);
+}
+
+.oppsettmeny-topp h2 {
+  margin: 0;
+}
+
+.oppsettmeny-topp button {
+  min-height: 44px;
+  padding: 0.4rem 1.4rem;
+}
+
+.oppsettmeny-ingress {
+  max-width: 46rem;
+  font-size: 0.92rem;
+}
+
+.oppsettseksjon {
+  border-top: 1px solid var(--kant);
+  padding: 0.9rem 0 0.4rem;
+}
+
+.oppsettseksjon-topp {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.oppsettseksjon-tittel {
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bk-teal-dark);
+  margin: 0;
+}
+
+.oppsettseksjon.ikke-i-kartet .oppsettseksjon-tittel {
+  color: var(--dempet);
+}
+
+.oppsettmerknad {
+  background: var(--bk-amber-flate);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+/* Ordne i rutenett og automatisk orientering */
+.verktoydel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  width: 100%;
+  border-top: 1px solid var(--kant);
+  padding-top: 0.6rem;
+}
+
+.orienteringsvalg .avkryssing {
+  min-height: 44px;
+}
+
+.orienteringsvalg p {
+  margin: 0;
+}
+
 /* ---------- Rolleoversikt ---------- */
 
 .ukenavigasjon {

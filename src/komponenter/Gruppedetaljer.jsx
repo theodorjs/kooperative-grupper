@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { gruppenavn } from '../logikk/grupper.js';
+import { oppsettFor } from '../logikk/maler.js';
 import { normaliserVinkel } from '../logikk/orientering.js';
+import { Oppsettvalg } from './Oppsettegning.jsx';
 
 function Navnefelt({ gruppe, onNavn }) {
   const [utkast, setUtkast] = useState(gruppe.navn ?? '');
@@ -26,13 +28,14 @@ function Navnefelt({ gruppe, onNavn }) {
 export default function Gruppedetaljer({
   gruppe,
   antallGrupper,
-  rotasjon,
+  oppsett,
+  egetOppsett,
   navn,
   renummerering,
   onNummer,
   onNavn,
   onStorrelse,
-  onLangArm,
+  onOppsett,
   onRotasjon,
   onLas,
   onStartRenummerering,
@@ -91,29 +94,41 @@ export default function Gruppedetaljer({
         </div>
       </fieldset>
 
-      {gruppe.storrelse === 5 && (
+      {gruppe.storrelse > 1 && (
         <fieldset>
-          <legend>Lang arm</legend>
-          <div className="segment">
-            <button type="button" aria-pressed={gruppe.langArm === 'venstre'} onClick={() => onLangArm('venstre')}>
-              Venstre
-            </button>
-            <button type="button" aria-pressed={gruppe.langArm === 'hoyre'} onClick={() => onLangArm('hoyre')}>
-              Høyre
-            </button>
+          <legend>Layout</legend>
+          <div className="oppsettvalgliste kompakt">
+            {oppsettFor(gruppe.storrelse).map((o) => (
+              <Oppsettvalg
+                key={o.id}
+                kompakt
+                storrelse={gruppe.storrelse}
+                oppsett={o.id}
+                valgt={oppsett === o.id}
+                onVelg={() => onOppsett(o.id)}
+              />
+            ))}
           </div>
+          {egetOppsett ? (
+            <p className="dempet liten oppsettstatus">
+              Denne gruppa har egen layout.{' '}
+              <button type="button" className="lenkeknapp" onClick={() => onOppsett(null)}>
+                Som resten av klassen
+              </button>
+            </p>
+          ) : (
+            <p className="dempet liten oppsettstatus">
+              Samme som resten av klassen. Knappen «Layout» øverst endrer alle gruppene med {gruppe.storrelse}.
+            </p>
+          )}
         </fieldset>
       )}
 
       <fieldset>
         <legend>Retning</legend>
         <label className="avkryssing">
-          <input
-            type="checkbox"
-            checked={automatisk}
-            onChange={(e) => onRotasjon(e.target.checked ? null : Math.round(rotasjon))}
-          />
-          Automatisk mot tavla
+          <input type="checkbox" checked={automatisk} onChange={(e) => onRotasjon(e.target.checked ? null : 0)} />
+          Automatisk orientering
         </label>
         {!automatisk && (
           <div className="rotasjon">

@@ -1,5 +1,6 @@
 import { DATAVERSJON, lagStandarddata, STANDARD_ROM } from './standarddata.js';
-import { gyldigStorrelse, lagPlasser } from '../logikk/grupper.js';
+import { gyldigStorrelse, lagPlasser, synkLangArm } from '../logikk/grupper.js';
+import { gyldigOppsett, standardOppsett, STORRELSER_MED_VALG } from '../logikk/maler.js';
 import { normaliserRoller, normaliserRotasjonsroller } from '../logikk/rollebibliotek.js';
 import { erGyldigDato, iDag, mandagForDato } from '../logikk/uke.js';
 
@@ -21,6 +22,21 @@ const erObjekt = (v) => v !== null && typeof v === 'object' && !Array.isArray(v)
 const tekst = (v, standard = '') => (typeof v === 'string' ? v : standard);
 const tall = (v, standard) => (typeof v === 'number' && Number.isFinite(v) ? v : standard);
 
+/** Klassens layout per gruppestørrelse. Mangler eller ukjent gir standard (slik kartet så ut før). */
+function normaliserKlasseoppsett(oppsett) {
+  const inn = erObjekt(oppsett) ? oppsett : {};
+  return Object.fromEntries(
+    STORRELSER_MED_VALG.map((s) => [s, gyldigOppsett(s, inn[s]) ? inn[s] : standardOppsett(s)]),
+  );
+}
+
+/** Gruppas egen layout, eller null når den følger klassen. */
+function normaliserGruppeoppsett(g, storrelse) {
+  // Fra før layoutvalget: en 5-gruppe med lang arm til høyre beholder den.
+  if (g.oppsett === undefined) return storrelse === 5 && g.langArm === 'hoyre' ? 'lang-hoyre' : null;
+  return gyldigOppsett(storrelse, g.oppsett) ? g.oppsett : null;
+}
+
 function normaliserGruppe(g, i) {
   const storrelse = gyldigStorrelse(g.storrelse);
   const plasser = lagPlasser(storrelse, Array.isArray(g.plasser) ? g.plasser : []).map((p, j) => {
@@ -36,7 +52,8 @@ function normaliserGruppe(g, i) {
     nummer: tall(g.nummer, i + 1),
     navn: tekst(g.navn).slice(0, 40),
     storrelse,
-    langArm: g.langArm === 'hoyre' ? 'hoyre' : 'venstre',
+    oppsett: normaliserGruppeoppsett(g, storrelse),
+    langArm: 'venstre', // settes etter layouten av synkLangArm
     x: tall(g.x, 1),
     y: tall(g.y, 1),
     rotasjon: typeof g.rotasjon === 'number' && Number.isFinite(g.rotasjon) ? g.rotasjon : null,
@@ -68,14 +85,17 @@ export function normaliser(data) {
       .map((e) => ({ id: e.id, navn: tekst(e.navn) })),
   }));
 
-  const klassekart = data.klassekart.filter(erObjekt).map((k, i) => ({
-    id: tekst(k.id) || `kart-${i}`,
-    navn: tekst(k.navn, 'Klassekart'),
-    elevlisteId: tekst(k.elevlisteId),
-    opprettet: erGyldigDato(k.opprettet) ? k.opprettet : iDag(),
-    visGruppenavn: k.visGruppenavn !== false,
-    bordgrupper: (Array.isArray(k.bordgrupper) ? k.bordgrupper : []).filter(erObjekt).map(normaliserGruppe),
-  }));
+  const klassekart = data.klassekart.filter(erObjekt).map((k, i) =>
+    synkLangArm({
+      id: tekst(k.id) || `kart-${i}`,
+      navn: tekst(k.navn, 'Klassekart'),
+      elevlisteId: tekst(k.elevlisteId),
+      opprettet: erGyldigDato(k.opprettet) ? k.opprettet : iDag(),
+      visGruppenavn: k.visGruppenavn !== false,
+      oppsett: normaliserKlasseoppsett(k.oppsett),
+      bordgrupper: (Array.isArray(k.bordgrupper) ? k.bordgrupper : []).filter(erObjekt).map(normaliserGruppe),
+    }),
+  );
 
   const rom = erObjekt(inn.rom) ? inn.rom : {};
   const ferier = (Array.isArray(inn.ferier) ? inn.ferier : [])

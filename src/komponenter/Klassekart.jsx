@@ -13,24 +13,29 @@ import {
   velgKlassekart,
 } from '../data/operasjoner.js';
 import {
+  antallMedEgenRetning,
   antallPlasser,
+  automatiskOrientering,
   begrensTilRom,
   beregnGruppestorrelser,
   beskrivAvvik,
-  byttLangArm,
   elevordForm,
   endreGruppestorrelse,
   eleverSomMisterPlass,
   gruppenavn,
-  lagBordgruppe,
+  harEgetOppsett,
   lagBordgrupper,
   nummererGrupper,
+  nyBordgruppe,
   nyNummerering,
   ordneIRutenett,
+  settAutomatiskOrientering,
   settGruppenummer,
+  settGruppeoppsett,
+  settKlasseoppsett,
   standardNummerering,
-  standardPosisjoner,
 } from '../logikk/grupper.js';
+import { effektivtOppsett } from '../logikk/maler.js';
 import { gruppeRotasjon } from '../logikk/orientering.js';
 import { rotasjonsroller } from '../logikk/rollebibliotek.js';
 import { ferieForUke, ukeforskyvning } from '../logikk/roller.js';
@@ -46,6 +51,7 @@ import { formaterDato, iDag, ukeoverskrift } from '../logikk/uke.js';
 import Bordgruppe from './Bordgruppe.jsx';
 import Elevpanel from './Elevpanel.jsx';
 import Gruppedetaljer from './Gruppedetaljer.jsx';
+import Oppsettmeny from './Oppsettmeny.jsx';
 import { Utskriftsknapp, useUtskrift } from './Utskrift.jsx';
 import { SKALA } from './Pult.jsx';
 
@@ -119,6 +125,60 @@ function Kartvelger({ data, kart, endre, idag }) {
   );
 }
 
+/**
+ * Automatisk orientering for alle bordgruppene i kartet. Avkrysset når alle
+ * gruppene har det, halvveis når bare noen har det.
+ */
+function Orienteringsvalg({ bordgrupper, onEndre }) {
+  const boks = useRef(null);
+  const tilstand = automatiskOrientering(bordgrupper);
+  const automatiske = bordgrupper.filter((g) => g.rotasjon === null).length;
+
+  // Halvveis-merket kan bare settes fra skript, og et klikk fjerner det.
+  const settHalvveis = () => {
+    if (boks.current) boks.current.indeterminate = tilstand === 'noen';
+  };
+  useEffect(settHalvveis);
+
+  function endre() {
+    const pa = tilstand !== 'alle';
+    const egne = antallMedEgenRetning(bordgrupper);
+    if (pa && egne > 0) {
+      const hvem = egne === 1 ? '1 bordgruppe' : `${egne} bordgrupper`;
+      const sporsmal = `${hvem} har en egen retning som blir borte. Vil du slå på automatisk orientering for alle?`;
+      if (!window.confirm(sporsmal)) {
+        settHalvveis();
+        return;
+      }
+    }
+    onEndre(pa);
+  }
+
+  return (
+    <div className="orienteringsvalg">
+      <label className="avkryssing">
+        <input
+          ref={boks}
+          type="checkbox"
+          checked={tilstand === 'alle'}
+          disabled={tilstand === 'tom'}
+          onChange={endre}
+          aria-describedby="orientering-forklaring"
+        />
+        Automatisk orientering
+      </label>
+      <p id="orientering-forklaring" className="dempet liten">
+        Automatisk orientering roterer pultene sånn at elevene ser mot tavla.
+      </p>
+      {tilstand === 'noen' && (
+        <p className="dempet liten">
+          {automatiske} av {bordgrupper.length} bordgrupper har automatisk orientering.
+        </p>
+      )}
+    </div>
+  );
+}
+
 /** En gruppe verktøy med overskrift, så knappene står samlet etter hva de virker på. */
 function Verktoygruppe({ tittel, children }) {
   return (
@@ -171,14 +231,11 @@ export default function Klassekart({ data, endre }) {
     if (!window.confirm(sporsmal)) return;
     setValgtId(null);
     setRenummerering(null);
-    endreKart((k) => ({ ...k, bordgrupper: lagBordgrupper(storrelser, rom) }));
+    endreKart((k) => ({ ...k, bordgrupper: lagBordgrupper(storrelser, rom, k) }));
   }
 
   function leggTilGruppe() {
-    const antall = kart.bordgrupper.length;
-    const pos = standardPosisjoner(antall + 1, rom)[antall];
-    const nummer = Math.max(0, ...kart.bordgrupper.map((g) => g.nummer)) + 1;
-    const gruppe = lagBordgruppe({ nummer, storrelse: onsketGruppestorrelse, x: pos.x, y: pos.y });
+    const gruppe = nyBordgruppe(kart, onsketGruppestorrelse, rom);
     endreKart((k) => ({ ...k, bordgrupper: [...k.bordgrupper, gruppe] }));
     setValgtId(gruppe.id);
   }
@@ -204,9 +261,24 @@ export default function Klassekart({ data, endre }) {
   }
 
   function ordne() {
-    if (window.confirm('Flytte alle bordgruppene tilbake til rutenettet og slå på automatisk retning?')) {
-      endreKart((k) => ({ ...k, bordgrupper: ordneIRutenett(k.bordgrupper, rom) }));
+    const rettes = antallMedEgenRetning(kart.bordgrupper) > 0 ? ' Grupper som er dreid for hånd, settes rett.' : '';
+    if (window.confirm(`Flytte alle bordgruppene tilbake til rutenettet?${rettes}`)) {
+      endreKart((k) => ({ ...k, bordgrupper: ordneIRutenett(k.bordgrupper, rom, k) }));
     }
+  }
+
+  // Layout for alle grupper med en størrelse, eller for én gruppe (null = som klassen).
+  function velgKlasseoppsett(storrelse, oppsettId) {
+    setRenummerering(null);
+    endreKart((k) => settKlasseoppsett(k, storrelse, oppsettId));
+  }
+
+  function velgGruppeoppsett(gruppeId, oppsettId) {
+    setRenummerering(null);
+    endreKart((k) => ({
+      ...k,
+      bordgrupper: k.bordgrupper.map((g) => (g.id === gruppeId ? settGruppeoppsett(g, oppsettId, k) : g)),
+    }));
   }
 
   function fordelTilfeldig() {
@@ -392,16 +464,25 @@ export default function Klassekart({ data, endre }) {
                 ))}
               </select>
             </label>
+            <Oppsettmeny kart={kart} onVelg={velgKlasseoppsett} />
             <div className="knapperad">
               <button type="button" onClick={leggTilGruppe}>
                 Legg til bordgruppe
               </button>
-              <button type="button" onClick={ordne}>
-                Ordne i rutenett
-              </button>
               <button type="button" className="fare" onClick={lagGrupperPaNytt}>
                 Lag grupper på nytt
               </button>
+            </div>
+            <div className="verktoydel">
+              <button type="button" onClick={ordne}>
+                Ordne i rutenett
+              </button>
+              <Orienteringsvalg
+                bordgrupper={kart.bordgrupper}
+                onEndre={(pa) =>
+                  endreKart((k) => ({ ...k, bordgrupper: settAutomatiskOrientering(k.bordgrupper, pa) }))
+                }
+              />
             </div>
           </Verktoygruppe>
 
@@ -468,6 +549,7 @@ export default function Klassekart({ data, endre }) {
               <Bordgruppe
                 key={g.id}
                 gruppe={g}
+                oppsett={effektivtOppsett(g, kart)}
                 rotasjon={gruppeRotasjon(g, rom)}
                 navn={navn}
                 valgt={g.id === valgtId}
@@ -505,11 +587,12 @@ export default function Klassekart({ data, endre }) {
               antallGrupper={kart.bordgrupper.length}
               onNummer={(n) => endreKart((k) => ({ ...k, bordgrupper: settGruppenummer(k.bordgrupper, valgt.id, n) }))}
               onNavn={(tekst) => endreGruppe(valgt.id, (g) => ({ ...g, navn: tekst }))}
-              rotasjon={gruppeRotasjon(valgt, rom)}
+              oppsett={effektivtOppsett(valgt, kart)}
+              egetOppsett={harEgetOppsett(valgt, kart)}
               navn={navn}
               renummerering={renummerering?.gruppeId === valgt.id ? renummerering.rekkefolge : null}
               onStorrelse={(n) => endreStorrelse(valgt, n)}
-              onLangArm={(arm) => endreGruppe(valgt.id, (g) => byttLangArm(g, arm))}
+              onOppsett={(id) => velgGruppeoppsett(valgt.id, id)}
               onRotasjon={(r) => endreGruppe(valgt.id, (g) => ({ ...g, rotasjon: r }))}
               onLas={las}
               onStartRenummerering={() => setRenummerering({ gruppeId: valgt.id, rekkefolge: [] })}
@@ -523,7 +606,8 @@ export default function Klassekart({ data, endre }) {
             />
           ) : (
             <p className="hint kort">
-              Dra en bordgruppe for å flytte den. Klikk på en gruppe for å endre størrelse, retning eller nummerering.
+              Dra en bordgruppe for å flytte den. Klikk på en gruppe for å endre størrelse, layout, retning eller
+              nummerering.
             </p>
           )}
           <Elevpanel
