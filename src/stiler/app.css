@@ -392,6 +392,65 @@ legend {
   margin: 1rem auto;
 }
 
+/* Startsiden: skjemaet og eksempelet side om side, eksempelet først på smale skjermer */
+.oppstartside {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 1rem auto;
+  align-items: start;
+}
+
+.oppstartside .oppstart {
+  max-width: none;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .oppstartside {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 640px;
+  }
+
+  .oppstartside .eksempel {
+    order: -1;
+  }
+}
+
+.eksempel .eksempelkart {
+  pointer-events: none;
+  max-height: none;
+  margin: 0.25rem auto 0.5rem;
+}
+
+.eksempel .rolleforklaring {
+  margin-bottom: 0.75rem;
+}
+
+.fordeler {
+  margin: 0 0 1rem;
+  padding-left: 1.2rem;
+}
+
+.fordeler li {
+  margin-bottom: 0.25rem;
+}
+
+/* Banner mens eksempelklassen vises. Ingenting lagres da, så den teksten skjules. */
+.eksempelmodus .lagres {
+  display: none;
+}
+
+.varsel.eksempelbanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  background: var(--aksent-lys);
+}
+
 .personvern {
   background: var(--aksent-lys);
   padding: 0.6rem 0.8rem;

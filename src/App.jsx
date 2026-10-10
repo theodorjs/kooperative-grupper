@@ -23,12 +23,17 @@ export default function App() {
   const [lagringFeilet, setLagringFeilet] = useState(false);
   // Bekreftelsen etter en import står her, så den ikke forsvinner med startsiden.
   const [importmelding, setImportmelding] = useState(null);
+  // Eksempelklassen fra startsiden. Mens den vises, lagres ingenting.
+  const [eksempel, setEksempel] = useState(null);
 
   useEffect(() => {
     setLagringFeilet(!skrivData(data));
   }, [data]);
 
-  const endre = useCallback((endring) => setData((d) => endring(d)), []);
+  const endreLagret = useCallback((endring) => setData((d) => endring(d)), []);
+  const endreEksempel = useCallback((endring) => setEksempel((d) => endring(d)), []);
+  const vist = eksempel ?? data;
+  const endre = eksempel ? endreEksempel : endreLagret;
 
   const velgFane = useCallback((id) => {
     setFane(id);
@@ -47,17 +52,29 @@ export default function App() {
     if (!ferieimportAktiv) return undefined;
     let avbrutt = false;
     hentImporterteFerier().then((resultat) => {
-      if (resultat && !avbrutt) endre((d) => brukImporterteFerier(d, resultat));
+      if (resultat && !avbrutt) endreLagret((d) => brukImporterteFerier(d, resultat));
     });
     return () => {
       avbrutt = true;
     };
-  }, [ferieimportAktiv, endre]);
+  }, [ferieimportAktiv, endreLagret]);
 
-  const harElever = data.elevlister.length > 0;
+  const harElever = vist.elevlister.length > 0;
+
+  function utforsk(eksempeldata) {
+    setEksempel(eksempeldata);
+    setFane('kart');
+    window.scrollTo(0, 0);
+  }
+
+  function avsluttEksempel() {
+    setEksempel(null);
+    setFane('uka');
+    window.scrollTo(0, 0);
+  }
 
   return (
-    <div className="app">
+    <div className={eksempel ? 'app eksempelmodus' : 'app'}>
       <header className="topp ikke-utskrift">
         <div className="topp-innhold">
           <h1 className="apptittel">Kooperative grupper</h1>
@@ -86,6 +103,17 @@ export default function App() {
         </p>
       )}
 
+      {eksempel && (
+        <p className="varsel eksempelbanner ikke-utskrift" role="status">
+          <span>
+            <strong>Du utforsker en eksempelklasse.</strong> Prøv deg fram – ingenting lagres.
+          </span>
+          <button type="button" className="hoved" onClick={avsluttEksempel}>
+            Lag din egen klasse
+          </button>
+        </p>
+      )}
+
       <main className="side">
         {importmelding && (
           <p className="varsel ok importmelding ikke-utskrift" role="status">
@@ -101,14 +129,15 @@ export default function App() {
             endre={endre}
             onFerdig={() => velgFane('kart')}
             onImportert={visImportmelding}
+            onUtforsk={utforsk}
           />
         )}
-        {harElever && fane === 'uka' && <Rolleoversikt data={data} endre={endre} gaTil={velgFane} />}
-        {harElever && fane === 'kart' && <Klassekart data={data} endre={endre} />}
-        {harElever && fane === 'elever' && <Elevlister data={data} endre={endre} />}
-        {harElever && fane === 'roller' && <Rollene data={data} endre={endre} />}
+        {harElever && fane === 'uka' && <Rolleoversikt data={vist} endre={endre} gaTil={velgFane} />}
+        {harElever && fane === 'kart' && <Klassekart data={vist} endre={endre} />}
+        {harElever && fane === 'elever' && <Elevlister data={vist} endre={endre} />}
+        {harElever && fane === 'roller' && <Rollene data={vist} endre={endre} />}
         {harElever && fane === 'innstillinger' && (
-          <Innstillinger data={data} endre={endre} onImportert={visImportmelding} />
+          <Innstillinger data={vist} endre={endre} onImportert={visImportmelding} />
         )}
       </main>
 
