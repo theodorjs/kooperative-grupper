@@ -2,7 +2,8 @@
 // returnerer nye data, slik at de er enkle å teste og bruke fra React.
 
 import { nyId } from './id.js';
-import { beregnGruppestorrelser, gruppenavn, lagBordgrupper } from '../logikk/grupper.js';
+import { beregnGruppestorrelser, gruppenavn, lagBordgrupper, synkLangArm } from '../logikk/grupper.js';
+import { standardKlasseoppsett } from '../logikk/maler.js';
 import { finnElev, ryddUkjenteElever } from '../logikk/tildeling.js';
 import { iDag } from '../logikk/uke.js';
 
@@ -121,19 +122,29 @@ export function standardKartnavn(data) {
   return `Klassekart ${data.klassekart.length + 1}`;
 }
 
-/** Nytt klassekart for den aktive elevlista, med grupper etter prinsippet. */
+/**
+ * Nytt klassekart for den aktive elevlista, med grupper etter prinsippet.
+ * Layoutene læreren har valgt i det aktive kartet, gjelder også det nye, og
+ * er automatisk orientering slått av der, står de nye gruppene rett.
+ */
 export function nyttKlassekart(data, navn, dato = iDag()) {
   const liste = aktivElevliste(data);
   if (!liste) return data;
   const storrelser = beregnGruppestorrelser(liste.elever.length, data.innstillinger.onsketGruppestorrelse);
-  const kart = {
+  const aktivt = aktivtKlassekart(data);
+  const oppsett = { ...(aktivt?.oppsett ?? standardKlasseoppsett()) };
+  const kart = synkLangArm({
     id: nyId(),
     navn: navn.trim() || 'Klassekart',
     elevlisteId: liste.id,
     opprettet: dato,
     visGruppenavn: true,
-    bordgrupper: lagBordgrupper(storrelser, data.innstillinger.rom),
-  };
+    oppsett,
+    bordgrupper: lagBordgrupper(storrelser, data.innstillinger.rom, {
+      oppsett,
+      bordgrupper: aktivt?.bordgrupper ?? [],
+    }),
+  });
   return medInnstillinger({ ...data, klassekart: [...data.klassekart, kart] }, { aktivtKlassekartId: kart.id });
 }
 
@@ -171,10 +182,11 @@ export function slettKlassekart(data, kartId) {
   return medInnstillinger(ny, { aktivtKlassekartId: neste });
 }
 
+/** Endrer ett klassekart. `langArm` holdes i takt med layouten (se synkLangArm). */
 export function oppdaterKlassekart(data, kartId, endring) {
   return {
     ...data,
-    klassekart: data.klassekart.map((k) => (k.id === kartId ? endring(k) : k)),
+    klassekart: data.klassekart.map((k) => (k.id === kartId ? synkLangArm(endring(k)) : k)),
   };
 }
 

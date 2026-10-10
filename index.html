@@ -12,6 +12,19 @@
         if (valg === 'mork') document.documentElement.setAttribute('data-theme', 'dark');
         if (valg === 'lys') document.documentElement.setAttribute('data-theme', 'light');
       } catch (e) {}
+      // Skolefarger når adressen begynner med skolens prefiks (se src/data/skoletema.js).
+      // ?skole=<id> forhåndsviser, ?skole=ingen slår av.
+      // Egen try, så skolefargene kommer selv om nettleseren stenger lagringen.
+      try {
+        var skoler = { 'torderod': 'torderod' }; // prefiks: skole-id
+        var vert = location.hostname.toLowerCase().replace(/^www\./, '');
+        var skole = null;
+        for (var prefiks in skoler) if (!skole && vert.startsWith(prefiks)) skole = skoler[prefiks];
+        var onsket = new URLSearchParams(location.search).get('skole');
+        if (onsket === 'ingen') skole = null;
+        for (prefiks in skoler) if (skoler[prefiks] === onsket) skole = onsket;
+        if (skole) document.documentElement.setAttribute('data-skole', skole);
+      } catch (e) {}
     </script>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>Kooperative grupper</title>

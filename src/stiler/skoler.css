@@ -1,0 +1,111 @@
+/*
+ * Skolefarger. På en skoles egen nettside setter index.html
+ * <html data-skole="<id>">, og fargene her erstatter fargene i farger.css.
+ * Skolene og adressene deres står i src/data/skoletema.js.
+ *
+ * Hver skole har tre blokker:
+ *   html[data-skole="<id>"]: lyse farger. Uten medieregel, så utskrift også får dem.
+ *   To mørke blokker, bare på skjerm: for valget «Mørk» og for automatisk
+ *   mørk modus. De må være like.
+ * html[data-skole] veier like mye som html[data-theme="dark"] i farger.css, så de
+ * mørke blokkene må ha en verdi for hver farge den lyse blokken endrer. Ellers slår
+ * den lyse skolefargen gjennom i mørk modus. farger.test.js sjekker dette og kontrasten.
+ */
+
+/* ---------- Torderød skole (torderodskole.no) ----------
+ * Lys, varm og rolig som skolens nettside: dyp rød for knapper, lenker,
+ * overskrifter og små titler, oker som andrefarge, varm hvit bakgrunn og
+ * brune nøytraler. Ok-meldinger får en nøytral flate, så de ikke ligner
+ * feilmeldingene (som er røde).
+ * Hentet fra forsiden: knapper og bunnfelt #A70F10, overskrifter #841E1E,
+ * logoen #BB212C, oker #A08850, streken under toppfeltet #732624.
+ * Nettsiden har ingen mørk modus; den mørke varianten er laget i samme ånd.
+ */
+
+html[data-skole="torderod"] {
+  --bk-teal: #A50E12;
+  --bk-teal-dark: #7F1D1D;
+  --bk-teal-deep: #6B1414;
+  --bk-amber: #A08850;
+  --bk-bg: #FAF6F0;
+  --bk-card: #FFFFFF;
+  --bk-line: #EADFD3;
+  --bk-ink: #2A211C;
+  --bk-muted: #6E625A;
+  --bk-overskrift: #7F1D1D;
+  --bk-amber-flate: rgba(160, 136, 80, 0.18);
+  --bk-amber-tekst: #6E5420;
+  --bk-teal-flate: rgba(184, 32, 44, 0.08);
+  --bk-noytral-flate: rgba(138, 126, 108, 0.10);
+  --bk-ok-flate: rgba(138, 126, 108, 0.16);
+  --bk-tabellflate: #F8EEEB;
+  --bk-knapp: #A50E12;
+  --bk-knapp-tekst: #FFFFFF;
+  --bk-pultkant: #2A211C;
+  --bk-stol: rgba(138, 126, 108, 0.22);
+  --bk-tabellkant-sterk: #2A211C;
+  --bk-tabellkant: #6E625A;
+  --bk-toppkant: #702424;
+}
+
+@media screen {
+  html[data-skole="torderod"][data-theme="dark"] {
+    --bk-teal: #F08A8D;
+    --bk-teal-dark: #F6B9BB;
+    --bk-teal-deep: #C8323A;
+    --bk-amber: #D4B46A;
+    --bk-bg: #171213;
+    --bk-card: #211A1B;
+    --bk-line: #3A2E2F;
+    --bk-ink: #F2ECE8;
+    --bk-muted: #B3A6A2;
+    --bk-overskrift: #F6B9BB;
+    --bk-amber-flate: rgba(212, 180, 106, 0.16);
+    --bk-amber-tekst: #E2C27A;
+    --bk-teal-flate: rgba(240, 138, 141, 0.14);
+    --bk-noytral-flate: rgba(179, 166, 162, 0.10);
+    --bk-ok-flate: rgba(179, 166, 162, 0.14);
+    --bk-tabellflate: #2A2021;
+    --bk-knapp: #E86A70;
+    --bk-knapp-tekst: #1A1011;
+    --bk-rom: #211A1B;
+    --bk-pult: #2A2122;
+    --bk-pultkant: #B3A6A2;
+    --bk-stol: rgba(179, 166, 162, 0.22);
+    --bk-tabellkant-sterk: #3A2E2F;
+    --bk-tabellkant: #3A2E2F;
+    --bk-skygge: 0 1px 2px rgb(0 0 0 / 45%), 0 1px 6px rgb(0 0 0 / 30%);
+    --bk-toppkant: #7A2A2E;
+  }
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  html[data-skole="torderod"]:not([data-theme="light"]) {
+    --bk-teal: #F08A8D;
+    --bk-teal-dark: #F6B9BB;
+    --bk-teal-deep: #C8323A;
+    --bk-amber: #D4B46A;
+    --bk-bg: #171213;
+    --bk-card: #211A1B;
+    --bk-line: #3A2E2F;
+    --bk-ink: #F2ECE8;
+    --bk-muted: #B3A6A2;
+    --bk-overskrift: #F6B9BB;
+    --bk-amber-flate: rgba(212, 180, 106, 0.16);
+    --bk-amber-tekst: #E2C27A;
+    --bk-teal-flate: rgba(240, 138, 141, 0.14);
+    --bk-noytral-flate: rgba(179, 166, 162, 0.10);
+    --bk-ok-flate: rgba(179, 166, 162, 0.14);
+    --bk-tabellflate: #2A2021;
+    --bk-knapp: #E86A70;
+    --bk-knapp-tekst: #1A1011;
+    --bk-rom: #211A1B;
+    --bk-pult: #2A2122;
+    --bk-pultkant: #B3A6A2;
+    --bk-stol: rgba(179, 166, 162, 0.22);
+    --bk-tabellkant-sterk: #3A2E2F;
+    --bk-tabellkant: #3A2E2F;
+    --bk-skygge: 0 1px 2px rgb(0 0 0 / 45%), 0 1px 6px rgb(0 0 0 / 30%);
+    --bk-toppkant: #7A2A2E;
+  }
+}

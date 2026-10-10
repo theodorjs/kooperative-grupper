@@ -1,5 +1,6 @@
 import { DATAVERSJON, lagStandarddata, STANDARD_ROM } from './standarddata.js';
-import { gyldigStorrelse, lagPlasser } from '../logikk/grupper.js';
+import { gyldigStorrelse, lagPlasser, synkLangArm } from '../logikk/grupper.js';
+import { gyldigOppsett, standardOppsett, STORRELSER_MED_VALG } from '../logikk/maler.js';
 import { normaliserRoller, normaliserRotasjonsroller } from '../logikk/rollebibliotek.js';
 import { erGyldigDato, iDag, mandagForDato } from '../logikk/uke.js';
 
@@ -21,6 +22,37 @@ const erObjekt = (v) => v !== null && typeof v === 'object' && !Array.isArray(v)
 const tekst = (v, standard = '') => (typeof v === 'string' ? v : standard);
 const tall = (v, standard) => (typeof v === 'number' && Number.isFinite(v) ? v : standard);
 
+/** Klassens layout per gruppestørrelse. Mangler eller ukjent gir standard (slik kartet så ut før). */
+function normaliserKlasseoppsett(oppsett) {
+  const inn = erObjekt(oppsett) ? oppsett : {};
+  return Object.fromEntries(
+    STORRELSER_MED_VALG.map((s) => [s, gyldigOppsett(s, inn[s]) ? inn[s] : standardOppsett(s)]),
+  );
+}
+
+/** Gruppas egen layout, eller null når den følger klassen. */
+function normaliserGruppeoppsett(g, storrelse) {
+  // Fra før layoutvalget: en 5-gruppe med lang arm til høyre beholder den.
+  if (g.oppsett === undefined) return storrelse === 5 && g.langArm === 'hoyre' ? 'lang-hoyre' : null;
+  return gyldigOppsett(storrelse, g.oppsett) ? g.oppsett : null;
+}
+
+/**
+ * Fra før layoutvalget (kartet har ikke `oppsett`): har alle 5-gruppene lang
+ * arm til høyre, blir det klassens layout for 5, så Layout-knappen og
+ * dialogen viser det gruppene har. Kartet tegnes likt. Er 5-gruppene
+ * blandet, beholder hver gruppe sin egen layout.
+ */
+function langArmForKlassen(k, kart) {
+  const fem = kart.bordgrupper.filter((g) => g.storrelse === 5);
+  if (k.oppsett !== undefined || fem.length === 0 || !fem.every((g) => g.oppsett === 'lang-hoyre')) return kart;
+  return {
+    ...kart,
+    oppsett: { ...kart.oppsett, 5: 'lang-hoyre' },
+    bordgrupper: kart.bordgrupper.map((g) => (g.storrelse === 5 ? { ...g, oppsett: null } : g)),
+  };
+}
+
 function normaliserGruppe(g, i) {
   const storrelse = gyldigStorrelse(g.storrelse);
   const plasser = lagPlasser(storrelse, Array.isArray(g.plasser) ? g.plasser : []).map((p, j) => {
@@ -36,7 +68,8 @@ function normaliserGruppe(g, i) {
     nummer: tall(g.nummer, i + 1),
     navn: tekst(g.navn).slice(0, 40),
     storrelse,
-    langArm: g.langArm === 'hoyre' ? 'hoyre' : 'venstre',
+    oppsett: normaliserGruppeoppsett(g, storrelse),
+    langArm: 'venstre', // settes etter layouten av synkLangArm
     x: tall(g.x, 1),
     y: tall(g.y, 1),
     rotasjon: typeof g.rotasjon === 'number' && Number.isFinite(g.rotasjon) ? g.rotasjon : null,
@@ -68,14 +101,19 @@ export function normaliser(data) {
       .map((e) => ({ id: e.id, navn: tekst(e.navn) })),
   }));
 
-  const klassekart = data.klassekart.filter(erObjekt).map((k, i) => ({
-    id: tekst(k.id) || `kart-${i}`,
-    navn: tekst(k.navn, 'Klassekart'),
-    elevlisteId: tekst(k.elevlisteId),
-    opprettet: erGyldigDato(k.opprettet) ? k.opprettet : iDag(),
-    visGruppenavn: k.visGruppenavn !== false,
-    bordgrupper: (Array.isArray(k.bordgrupper) ? k.bordgrupper : []).filter(erObjekt).map(normaliserGruppe),
-  }));
+  const klassekart = data.klassekart.filter(erObjekt).map((k, i) =>
+    synkLangArm(
+      langArmForKlassen(k, {
+        id: tekst(k.id) || `kart-${i}`,
+        navn: tekst(k.navn, 'Klassekart'),
+        elevlisteId: tekst(k.elevlisteId),
+        opprettet: erGyldigDato(k.opprettet) ? k.opprettet : iDag(),
+        visGruppenavn: k.visGruppenavn !== false,
+        oppsett: normaliserKlasseoppsett(k.oppsett),
+        bordgrupper: (Array.isArray(k.bordgrupper) ? k.bordgrupper : []).filter(erObjekt).map(normaliserGruppe),
+      }),
+    ),
+  );
 
   const rom = erObjekt(inn.rom) ? inn.rom : {};
   const ferier = (Array.isArray(inn.ferier) ? inn.ferier : [])
@@ -148,29 +186,40 @@ export function skrivData(data, lager = standardLager()) {
   }
 }
 
-export function eksportfilnavn(dato = iDag()) {
-  return `kooperative-grupper-${dato}.json`;
+export function backupfilnavn(dato = iDag()) {
+  return `kooperative-grupper-backup-${dato}.json`;
 }
 
-/** Laster ned alle data som en JSON-fil. Skjer helt lokalt i nettleseren. */
-export function lastNedData(data) {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+/** Lager en JSON-fil av dataene, klar til å lastes ned eller deles. */
+export function lagDatafil(data, filnavn) {
+  return new File([JSON.stringify(data, null, 2)], filnavn, { type: 'application/json' });
+}
+
+/** Laster ned en fil. Skjer helt lokalt i nettleseren. */
+export function lastNedFil(fil) {
+  const url = URL.createObjectURL(fil);
   const lenke = document.createElement('a');
   lenke.href = url;
-  lenke.download = eksportfilnavn();
+  lenke.download = fil.name;
   document.body.appendChild(lenke);
   lenke.click();
   lenke.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function tolkImport(tekstinnhold) {
-  let parsed;
+/** Laster ned alle data som en backup. */
+export function lastNedBackup(data) {
+  lastNedFil(lagDatafil(data, backupfilnavn()));
+}
+
+export function lesJson(tekstinnhold) {
   try {
-    parsed = JSON.parse(tekstinnhold);
+    return JSON.parse(tekstinnhold);
   } catch {
     throw new DataFeil('Filen er ikke en gyldig JSON-fil.');
   }
-  return normaliser(parsed);
+}
+
+export function tolkImport(tekstinnhold) {
+  return normaliser(lesJson(tekstinnhold));
 }

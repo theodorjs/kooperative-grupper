@@ -8,6 +8,7 @@ const KANT = 0.32; // ekstra flate rundt pultene (stoler) som kan brukes til å 
 
 export default function Bordgruppe({
   gruppe,
+  oppsett,
   rotasjon,
   navn,
   valgt,
@@ -20,7 +21,7 @@ export default function Bordgruppe({
   onPultPeker,
   visNavn = true,
 }) {
-  const mal = lagMal(gruppe.storrelse, gruppe.langArm);
+  const mal = lagMal(gruppe.storrelse, oppsett);
   const halvB = mal.bredde / 2 + KANT;
   const halvH = mal.hoyde / 2 + KANT;
   const etikett = lokalTilRom({ x: 0, y: mal.hoyde / 2 + KANT + 0.28 }, gruppe, rotasjon);

@@ -11,6 +11,8 @@ export const ROLLENUMRE = [1, 2, 3, 4];
 /**
  * Rolleposisjoner per gruppestørrelse. Hver posisjon er en liste med roller,
  * slik at sammenslåtte roller (dobbeltroller) roterer som én posisjon.
+ * Rollene følger plassnummeret, ikke hvor pulten står, så de gjelder for
+ * alle layoutene i maler.js.
  */
 export const ROLLEPOSISJONER = {
   1: [[1, 2, 3, 4]],                 // Alle roller

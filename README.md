@@ -10,20 +10,25 @@ Klassekart og rolleoversikt kan skrives ut eller lagres som PDF.
 - Elevnavn ligger aldri i koden eller i repoet. Elevlisten limes inn i appen og lagres bare i nettleseren
   (`localStorage`).
 - Appen sender ingenting over nettet: ingen analyse, ingen eksterne fonter, ingen API-kall.
-- Under **Innstillinger** kan du laste ned alle data som en JSON-fil (sikkerhetskopi) og importere dem i en annen
-  nettleser. Filen inneholder elevnavn – ikke legg den i repoet. `.gitignore` stopper filer med standardnavnet
-  `kooperative-grupper-*.json`.
+- Under **Innstillinger** kan du sende én klasse til en kollega med AirDrop, eller laste ned en backup med alle data
+  som en JSON-fil. Filene inneholder elevnavn – send dem bare direkte til kolleger, og ikke legg dem i repoet.
+  `.gitignore` stopper filer med standardnavnet `kooperative-grupper-*.json`.
 
 ## Bruk
 
 1. **Første oppstart:** lim inn elevlisten, ett navn per linje. Appen lager et klassekart med grupper etter ønsket
    gruppestørrelse (standard 4; 21 elever gir 3 grupper med 4 og 3 med 3).
 2. **Klassekart:** verktøyene øverst er samlet i fire grupper: Klassekart, Bordgrupper, Elever og Visning. Dra
-   bordgruppene dit de står i rommet. De snur seg automatisk mot tavla. Dra elever fra listen til
-   plassene, eller trykk **Tilfeldig fordeling**. Klikk på en gruppe for å endre nummer og navn, antall plasser, lang
-   arm (5-grupper), retning eller plassnummerering. **Vis gruppenavn** slår navnene på kartet av og på. En låst elev
-   blir sittende ved tilfeldig fordeling. Navnene på pultene leses fra elevens side, men snus hvis de ellers ville stått
-   opp ned på kartet; stolen viser hvilken vei eleven sitter.
+   bordgruppene dit de står i rommet. Med **Automatisk orientering** snur gruppene seg sånn at elevene ser mot tavla;
+   slår du den av, står alle gruppene rett, parallelt med veggene. **Ordne i rutenett** flytter gruppene tilbake
+   til rutenettet. **Layout** viser hvordan pultene står, og der velger du layout for alle gruppene med 2, 3, 4 eller
+   5 plasser i klassekartet (for eksempel med eller uten åpning, blokk eller tre på rekke). Overlapper gruppene etter
+   en bredere layout, sier Layout fra og kan ordne dem i rutenettet. Nye klassekart får samme layout, og står rett
+   hvis automatisk orientering er slått av. Dra elever fra listen til plassene, eller trykk **Tilfeldig fordeling**.
+   Klikk på en gruppe for å endre nummer og navn, antall plasser, layout for bare den gruppa, retning eller
+   plassnummerering. Elevene blir sittende på plassnummeret sitt når layouten byttes. **Vis gruppenavn** slår
+   navnene på kartet av og på. En låst elev blir sittende ved tilfeldig fordeling. Navnene på pultene leses fra
+   elevens side, men snus hvis de ellers ville stått opp ned på kartet; stolen viser hvilken vei eleven sitter.
 3. **Denne uka:** rolleoversikten. Plassnummeret er fast, rollen roterer hver mandag. Rotasjonen står stille i
    ferieuker (uker der minst tre av fem skoledager er ferie), og uka etter ferien får elevene nye roller.
 4. **Skriv ut** lar deg velge A4 eller A3: stående for klassekartet og liggende for rolleoversikten. I A3 blir
@@ -33,13 +38,37 @@ Klassekart og rolleoversikt kan skrives ut eller lagres som PDF.
 5. **Rollene:** biblioteket over samarbeidsrollene, som kort med ikon, navn og beskrivelse. Legg til nye roller,
    endre eller slett dem. Øverst velger du hvilke fire roller som brukes i rotasjonen; navn, ikon og farge vises da i
    «Denne uka» og på klassekartet. En rolle som står i rotasjonen, må byttes ut før den kan slettes.
+6. **Dele med en kollega:** under **Innstillinger → Data og personvern** sender **AirDrop til en kollega** én klasse
+   (elevlista med klassekartene) gjennom delingsmenyen på iPad. Har du flere klasser, velger du hvilken. Kollegaen
+   lagrer fila og trykker **Importer fra fil** i appen. Klassene i fila legges inn som nye klasser, og de andre
+   klassene blir ikke endret. Finnes det fra før en klasse med samme navn, blir den overskrevet, men først kommer en
+   advarsel. Hver klasse i fila overskriver høyst én klasse: har du to med samme navn, blir den første overskrevet og
+   den andre stående. Har kollegaen klasser fra før, er roller, rotasjon, ferier og rom kollegaens egne, og grupper
+   som står utenfor rommet, flyttes inn. Legges klassen inn fra startsiden (uten klasser), følger rommet, rollene og
+   rotasjonen med fra fila, så elevene får de samme rollene som hos deg. Der delingsmenyen ikke finnes (for eksempel
+   i Chrome på PC), lastes fila ned i stedet. Eldre versjoner av appen kan ikke lese klassefila, og avviser den i
+   stedet for å lese den som en backup.
+7. **Backup:** **Last ned en backup** lagrer alle klasser, roller og innstillinger i én fil. I en ny nettleser (uten
+   klasser) gir **Importer fra fil** på startsiden alt tilbake slik det var, uten spørsmål, og appen sier fra når
+   backupen er lest inn. Hos en som har klasser fra før, legges klassene i backupen inn som nye klasser.
 
 Standardrollene (fra plakatene) står i `src/logikk/rollebibliotek.js`. Hvordan rollene slås sammen i små grupper,
 står i `src/logikk/roller.js`.
+Layoutene for bordgruppene står i `src/logikk/maler.js`. Feltet `langArm` holdes i takt med layouten, så eldre
+versjoner av appen tegner 5-gruppene riktig.
 
 **Fargevalg:** Under **Innstillinger** velger du lys, mørk eller automatisk (følger maskinen). Valget gjelder bare
 den nettleseren, og utskrifter blir alltid lyse. Fargene kommer fra fargesystemet i «Min bruksanvisning» og ligger i
 `src/stiler/farger.css`.
+
+**Skolefarger:** Når nettadressen begynner med «torderod» (for eksempel https://torderodskole.no/cc/ eller
+torderod.github.io, med eller uten «www.»), bruker appen Torderød skoles farger: dyp rød for knapper, lenker og
+overskrifter, oker som andrefarge og varme, lyse flater. Skolefargene har både lys og mørk variant, så fargevalget
+virker som før, og utskrifter blir lyse. Andre steder brukes de vanlige fargene. Legg til `?skole=torderod` i adressen
+for å se skolefargene, eller `?skole=ingen` for å slå dem av (valget lagres ikke). Under **Innstillinger → Fargevalg**
+står det når skolefargene er i bruk. Skolene står i `src/data/skoletema.js` og i en liten tabell i `index.html`,
+fargene i `src/stiler/skoler.css`. Testene sjekker at tabellene er like, at de to mørke blokkene er like, og at teksten
+har god nok kontrast.
 
 ## Ferier fra skoleruta til Moss kommune
 
@@ -67,18 +96,20 @@ npm run build    # bygger til dist/
 
 Kildekoden er organisert slik:
 
-- `src/logikk/` – rene funksjoner uten React, med tester: gruppestørrelser, pultmaler, orientering, tildeling,
-  roller, ukenummer og tolkning av skolerute.
+- `src/logikk/` – rene funksjoner uten React, med tester: gruppestørrelser, pultmaler og layouter, orientering,
+  tildeling, roller, ukenummer og tolkning av skolerute.
 - `scripts/` – henting av ferier fra kommunen (kjøres av GitHub Actions).
-- `src/data/` – lagring, eksport/import og operasjoner på appdataene.
+- `src/data/` – lagring, deling av en klasse (`deling.js`), import som legger til klasser (`import.js`) og
+  operasjoner på appdataene.
 - `src/komponenter/` – React-komponentene. Klassekartet tegnes som SVG.
-- `src/stiler/` – fargesystemet (`farger.css`) og stiler for skjerm og utskrift.
+- `src/stiler/` – fargesystemet (`farger.css`), skolefarger (`skoler.css`) og stiler for skjerm og utskrift.
 
 ## Publisering på GitHub Pages
 
 Arbeidsflyten `.github/workflows/publiser.yml` tester, henter ferier, bygger og publiserer appen ved hver push til
 `main` og hver mandag morgen.
 Første gang må Pages slås på: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-Appen ligger på https://theodorjs.github.io/kooperative-grupper/.
+Appen ligger på https://theodorjs.github.io/kooperative-grupper/. Torderød skole bygger den samme koden og legger den
+på https://torderodskole.no/cc/, der skolefargene slås på automatisk.
 
 `vite.config.js` bruker relativ `base` (`./`), så appen virker uansett hva repoet heter.

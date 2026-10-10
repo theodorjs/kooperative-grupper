@@ -24,6 +24,9 @@
   --bk-ink: #1F2937;
   --bk-muted: #6B7280;
 
+  /* Overskriftene h1 og h2. Skolefargene (skoler.css) kan gi dem egen farge. */
+  --bk-overskrift: var(--bk-ink);
+
   /* Statusfarger */
   --bk-bom: #DD3333;
   --bk-fare-flate: rgba(221, 51, 51, 0.12);
@@ -33,6 +36,8 @@
   /* Flater */
   --bk-teal-flate: rgba(10, 124, 110, 0.08);
   --bk-noytral-flate: rgba(125, 140, 155, 0.10);
+  /* Ok-meldinger. Skolefargene kan gi dem egen flate, så de ikke ligner feilmeldingene. */
+  --bk-ok-flate: var(--bk-teal-flate);
   --bk-tabellflate: #F2F4FA;
 
   /* Knapper med fylt bakgrunn */
@@ -48,6 +53,9 @@
   /* Rolletabellen: tydelige streker også i svart-hvitt-utskrift */
   --bk-tabellkant-sterk: #1F2937;
   --bk-tabellkant: #6B7280;
+
+  /* Streken under toppfeltet. Skolefargene (skoler.css) kan gi den egen farge. */
+  --bk-toppkant: var(--bk-line);
 
   --bk-skygge: 0 1px 2px rgb(0 0 0 / 6%), 0 1px 6px rgb(0 0 0 / 4%);
 }

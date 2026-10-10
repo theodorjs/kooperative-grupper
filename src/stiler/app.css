@@ -49,6 +49,10 @@ h1, h2, h3 {
   margin: 0 0 0.6rem;
 }
 
+h1, h2 {
+  color: var(--bk-overskrift);
+}
+
 h2 {
   font-size: 1.15rem;
 }
@@ -67,7 +71,7 @@ p {
 
 .topp {
   background: var(--flate);
-  border-bottom: 1px solid var(--kant);
+  border-bottom: 1px solid var(--bk-toppkant);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -485,14 +489,28 @@ legend {
   font-size: 0.82rem;
 }
 
-/* Verktøyene på klassekartet, samlet etter hva de virker på */
+/* Verktøyene på klassekartet, samlet etter hva de virker på. Bordgrupper
+   har mest innhold og får to deler side om side: bred kolonne når alle fire
+   gruppene står på én rad, ellers en egen rad under de tre andre. Slik blir
+   verktøyfeltet lavt nok til at kartet synes på iPad. */
 .verktoygrupper {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr) minmax(0, 1fr) minmax(0, 1fr);
   gap: 0.75rem;
 }
 
 @media (max-width: 1150px) {
+  .verktoygrupper {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr) minmax(0, 1.1fr);
+  }
+
+  .verktoygruppe.bordgrupper {
+    grid-column: 1 / -1;
+    order: 1;
+  }
+}
+
+@media (max-width: 739px) {
   .verktoygrupper {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -501,6 +519,10 @@ legend {
 @media (max-width: 620px) {
   .verktoygrupper {
     grid-template-columns: 1fr;
+  }
+
+  .verktoygruppe.bordgrupper {
+    order: 0;
   }
 }
 
@@ -513,6 +535,17 @@ legend {
   border-radius: 6px;
   padding: 0.7rem 0.8rem 0.8rem;
   min-width: 0;
+}
+
+/* Slett, Lag grupper på nytt og Tøm alle plasser: nederst og midtstilt i
+   rammen (i Bordgrupper: i delen før skillelinja), slik at de står på linje
+   og skiller seg fra de andre knappene. */
+.farerad {
+  margin-top: auto;
+  align-self: stretch;
+  display: flex;
+  justify-content: center;
+  padding-top: 0.25rem;
 }
 
 .verktoygruppe-tittel {
@@ -929,6 +962,256 @@ legend {
   font-size: 0.9rem;
 }
 
+/* ---------- Layout for bordgruppene ---------- */
+
+/* Tegningene bruker tekstfargen, så de virker i lys og mørk modus. */
+.oppsettegning {
+  display: block;
+  overflow: visible;
+}
+
+.oppsettegning-tavle {
+  fill: var(--aksent);
+}
+
+.oppsettegning-pult {
+  fill: var(--bk-pult);
+  stroke: currentColor;
+  stroke-width: 1.25;
+}
+
+.oppsettegning-stol {
+  fill: currentColor;
+  opacity: 0.3;
+}
+
+.oppsettegning-nummer {
+  font-size: 28px;
+  font-weight: 600;
+  text-anchor: middle;
+  fill: currentColor;
+}
+
+/* Knappen «Layout» i verktøylinja */
+.layoutknapp {
+  min-height: 44px;
+  padding: 0.3rem 0.8rem 0.3rem 0.45rem;
+  gap: 0.55rem;
+}
+
+.layoutknapp .oppsettegning {
+  width: 48px;
+  height: 44px;
+}
+
+/* Valgknappene med tegning */
+.oppsettvalgliste {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.6rem;
+}
+
+.oppsettvalg {
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.3rem;
+  min-height: 44px;
+  padding: 0.7rem 0.75rem 0.8rem;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.oppsettvalg .oppsettegning {
+  width: 112px;
+  height: auto;
+  margin-bottom: 0.2rem;
+}
+
+.oppsettvalg[aria-pressed='true'] {
+  border-color: var(--aksent);
+  box-shadow: inset 0 0 0 1px var(--aksent);
+  background: var(--aksent-lys);
+}
+
+.oppsettvalg-navn {
+  font-weight: 600;
+}
+
+.oppsettvalgliste.kompakt {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.oppsettvalg.kompakt {
+  padding: 0.45rem 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  gap: 0.15rem;
+}
+
+.oppsettvalg.kompakt .oppsettegning {
+  width: 100%;
+  max-width: 84px;
+}
+
+.oppsettstatus {
+  margin: 0.4rem 0 0;
+}
+
+.oppsettstatus .lenkeknapp {
+  min-height: 44px;
+  font-size: inherit;
+}
+
+/* Menyen med alle layoutene */
+.oppsettmeny {
+  width: min(960px, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 0;
+  border: 1px solid var(--kant);
+  border-radius: var(--radius);
+  background: var(--flate);
+  color: var(--tekst);
+  box-shadow: 0 10px 40px rgb(0 0 0 / 25%);
+}
+
+.oppsettmeny::backdrop {
+  background: rgb(15 20 28 / 45%);
+}
+
+.oppsettmeny-innhold {
+  padding: 0 1.25rem 1.25rem;
+}
+
+.oppsettmeny-topp {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0 1rem;
+  padding: 0.9rem 0 0.6rem;
+  background: var(--flate);
+}
+
+/* Merknaden om overlappende grupper står i den faste toppen, så den synes
+   også når læreren har rullet ned til en annen gruppestørrelse. */
+.overlappvarsel {
+  flex-basis: 100%;
+}
+
+.overlappvarsel .oppsettmerknad {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+  margin: 0.6rem 0 0;
+}
+
+.oppsettmeny-topp h2 {
+  margin: 0;
+}
+
+.oppsettmeny-topp button {
+  min-height: 44px;
+  padding: 0.4rem 1.4rem;
+}
+
+.oppsettmeny-ingress {
+  max-width: 46rem;
+  font-size: 0.92rem;
+}
+
+.oppsettseksjon {
+  border-top: 1px solid var(--kant);
+  padding: 0.9rem 0 0.4rem;
+}
+
+.oppsettseksjon-topp {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.oppsettseksjon-tittel {
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bk-teal-dark);
+  margin: 0;
+}
+
+.oppsettseksjon.ikke-i-kartet .oppsettseksjon-tittel {
+  color: var(--dempet);
+}
+
+.oppsettmerknad {
+  background: var(--bk-amber-flate);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+/* Bordgrupper: størrelse, layout og knappene til venstre, ordne i rutenett
+   og automatisk orientering til høyre (under hverandre på smale skjermer).
+   Venstre del får plass til knappene på én rad når det er bredde nok. */
+.bordgrupperdeler {
+  display: grid;
+  grid-template-columns: auto minmax(11rem, 1fr);
+  gap: 0.55rem 0.8rem;
+  width: 100%;
+  /* Fyller rammen, så «Lag grupper på nytt» havner nederst på linje med de andre. */
+  flex-grow: 1;
+}
+
+.bordgrupperdel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.verktoydel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  min-width: 0;
+  border-left: 1px solid var(--kant);
+  padding-left: 0.8rem;
+}
+
+@media (max-width: 620px) {
+  .bordgrupperdeler {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .verktoydel {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--kant);
+    padding-top: 0.6rem;
+  }
+}
+
+.orienteringsvalg .avkryssing {
+  min-height: 44px;
+}
+
+.orienteringsvalg p {
+  margin: 0;
+}
+
 /* ---------- Rolleoversikt ---------- */
 
 .ukenavigasjon {
@@ -1256,6 +1539,91 @@ legend {
 
 .fargevalg-hjelp {
   margin: 0.6rem 0 0;
+}
+
+/* Data og personvern: knappen til venstre, forklaringen til høyre */
+.datavalg {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  gap: 0.9rem 1.25rem;
+  margin: 1rem 0;
+}
+
+.datavalg-rad {
+  display: contents;
+}
+
+.datavalg button {
+  min-height: 44px;
+  padding: 0.5rem 0.9rem;
+  gap: 0.5rem;
+}
+
+/* Med klassevelger står knappen på linje med velgeren, ikke midt på forklaringen. */
+.datavalg-rad.med-valg > button {
+  align-self: start;
+}
+
+.datavalg-hjelp p {
+  margin: 0;
+}
+
+.datavalg-klasse {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.datavalg-klasse select {
+  min-height: 44px;
+}
+
+.datavalg .varsel {
+  grid-column: 1 / -1;
+  margin: -0.3rem 0 0;
+  font-size: 0.9rem;
+}
+
+.varsel.ok {
+  background: var(--bk-ok-flate);
+}
+
+/* Bekreftelsen etter en import, øverst på siden, med «Lukk» */
+.varsel.importmelding {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+
+.importmelding .lenkeknapp {
+  flex-shrink: 0;
+  min-height: 44px;
+  font-size: inherit;
+}
+
+@media (max-width: 600px) {
+  .datavalg {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .datavalg button {
+    justify-self: start;
+  }
+
+  .datavalg-hjelp {
+    margin-bottom: 0.6rem;
+  }
 }
 
 /* Vises bare ved utskrift */
