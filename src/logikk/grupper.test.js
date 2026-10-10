@@ -7,12 +7,14 @@ import {
   bredesteGruppe,
   endreGruppestorrelse,
   gruppenavn,
+  grupperOverlapper,
   harEgetOppsett,
   kortGruppenavn,
   lagBordgrupper,
   nyBordgruppe,
   nyNummerering,
   ordneIRutenett,
+  rutenettGirPlass,
   settAutomatiskOrientering,
   settGruppenummer,
   settGruppeoppsett,
@@ -119,6 +121,65 @@ describe('standard plassering', () => {
     expect(kolonner).toBe(2);
     expect(bredesteGruppe(grupper, kart)).toBeCloseTo(2.52);
     expect(new Set(lagBordgrupper([3, 3, 3, 3, 3, 3, 3, 3, 3, 3], smalt).map((g) => g.x.toFixed(3))).size).toBe(3);
+  });
+});
+
+describe('grupper som overlapper', () => {
+  const pa = (storrelse, x, y, rotasjon = 0) => ({ storrelse, oppsett: null, x, y, rotasjon });
+  const paRekke = { ...standardKlasseoppsett(), 3: 'rekke' };
+
+  it('ser om pultene i to grupper står oppå hverandre, med layout og retning', () => {
+    const kart = (...bordgrupper) => ({ oppsett: paRekke, bordgrupper });
+    // Tre pulter på rekke er 2,52 m brede, standardlayouten for 3 er 1,2 m.
+    expect(grupperOverlapper(kart(pa(3, 2, 5), pa(3, 4.6, 5)), ROM)).toBe(false);
+    expect(grupperOverlapper(kart(pa(3, 2, 5), pa(3, 4.4, 5)), ROM)).toBe(true);
+    expect(grupperOverlapper(kart(pa(3, 2, 5, 90), pa(3, 4.4, 5, 90)), ROM)).toBe(false);
+    const standard = { oppsett: standardKlasseoppsett(), bordgrupper: [pa(3, 2, 5), pa(3, 4.4, 5)] };
+    expect(grupperOverlapper(standard, ROM)).toBe(false);
+    expect(grupperOverlapper(kart(pa(3, 2, 5)), ROM)).toBe(false);
+  });
+
+  it('finner ingen overlapp i standardplasseringen', () => {
+    for (const n of [12, 21, 24, 28, 30]) {
+      for (const storrelse of [2, 3, 4]) {
+        const bordgrupper = lagBordgrupper(beregnGruppestorrelser(n, storrelse), ROM);
+        const kart = { oppsett: standardKlasseoppsett(), bordgrupper };
+        expect(grupperOverlapper(kart, ROM)).toBe(false);
+        const rett = { ...kart, bordgrupper: settAutomatiskOrientering(kart.bordgrupper, false) };
+        expect(grupperOverlapper(rett, ROM)).toBe(false);
+      }
+    }
+  });
+
+  it('legger en ny gruppe der den ikke står oppå andre, også med tre pulter på rekke', () => {
+    const bordgrupper = lagBordgrupper(beregnGruppestorrelser(30, 3), ROM, { oppsett: paRekke });
+    for (const automatisk of [true, false]) {
+      const kart = { oppsett: paRekke, bordgrupper: settAutomatiskOrientering(bordgrupper, automatisk) };
+      expect(grupperOverlapper(kart, ROM)).toBe(false);
+      const ny = nyBordgruppe(kart, 3, ROM);
+      expect(grupperOverlapper({ ...kart, bordgrupper: [...kart.bordgrupper, ny] }, ROM)).toBe(false);
+      expect(ny.nummer).toBe(11);
+    }
+  });
+
+  it('foreslår «Ordne i rutenett» når en bredere layout gir overlapp som rutenettet løser', () => {
+    const smalt = { bredde: 7, lengde: 10 };
+    const bordgrupper = lagBordgrupper(beregnGruppestorrelser(30, 3), smalt);
+    const kart = { oppsett: standardKlasseoppsett(), bordgrupper };
+    expect(rutenettGirPlass(kart, smalt)).toBe(false);
+    const bred = settKlasseoppsett(kart, 3, 'rekke');
+    expect(grupperOverlapper(bred, smalt)).toBe(true);
+    expect(rutenettGirPlass(bred, smalt)).toBe(true);
+    const ordnet = { ...bred, bordgrupper: ordneIRutenett(bred.bordgrupper, smalt, bred) };
+    expect(grupperOverlapper(ordnet, smalt)).toBe(false);
+    expect(rutenettGirPlass(ordnet, smalt)).toBe(false);
+  });
+
+  it('foreslår ikke «Ordne i rutenett» når gruppene overlapper også i rutenettet', () => {
+    const trangt = { bredde: 3, lengde: 4 }; // fire firergrupper får ikke plass
+    const kart = { oppsett: standardKlasseoppsett(), bordgrupper: lagBordgrupper([4, 4, 4, 4], trangt) };
+    expect(grupperOverlapper(kart, trangt)).toBe(true);
+    expect(rutenettGirPlass(kart, trangt)).toBe(false);
   });
 });
 

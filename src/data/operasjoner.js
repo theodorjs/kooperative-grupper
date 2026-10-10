@@ -124,13 +124,15 @@ export function standardKartnavn(data) {
 
 /**
  * Nytt klassekart for den aktive elevlista, med grupper etter prinsippet.
- * Layoutene læreren har valgt i det aktive kartet, gjelder også det nye.
+ * Layoutene læreren har valgt i det aktive kartet, gjelder også det nye, og
+ * er automatisk orientering slått av der, står de nye gruppene rett.
  */
 export function nyttKlassekart(data, navn, dato = iDag()) {
   const liste = aktivElevliste(data);
   if (!liste) return data;
   const storrelser = beregnGruppestorrelser(liste.elever.length, data.innstillinger.onsketGruppestorrelse);
-  const oppsett = { ...(aktivtKlassekart(data)?.oppsett ?? standardKlasseoppsett()) };
+  const aktivt = aktivtKlassekart(data);
+  const oppsett = { ...(aktivt?.oppsett ?? standardKlasseoppsett()) };
   const kart = synkLangArm({
     id: nyId(),
     navn: navn.trim() || 'Klassekart',
@@ -138,7 +140,10 @@ export function nyttKlassekart(data, navn, dato = iDag()) {
     opprettet: dato,
     visGruppenavn: true,
     oppsett,
-    bordgrupper: lagBordgrupper(storrelser, data.innstillinger.rom, { oppsett }),
+    bordgrupper: lagBordgrupper(storrelser, data.innstillinger.rom, {
+      oppsett,
+      bordgrupper: aktivt?.bordgrupper ?? [],
+    }),
   });
   return medInnstillinger({ ...data, klassekart: [...data.klassekart, kart] }, { aktivtKlassekartId: kart.id });
 }

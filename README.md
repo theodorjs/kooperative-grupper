@@ -22,12 +22,13 @@ Klassekart og rolleoversikt kan skrives ut eller lagres som PDF.
    bordgruppene dit de står i rommet. Med **Automatisk orientering** snur gruppene seg sånn at elevene ser mot tavla;
    slår du den av, står alle gruppene rett, parallelt med veggene. **Ordne i rutenett** flytter gruppene tilbake
    til rutenettet. **Layout** viser hvordan pultene står, og der velger du layout for alle gruppene med 2, 3, 4 eller
-   5 plasser i klassekartet (for eksempel med eller uten åpning, blokk eller tre på rekke). Nye klassekart får samme
-   layout. Dra elever fra listen til plassene, eller trykk **Tilfeldig fordeling**. Klikk på en gruppe for å endre
-   nummer og navn, antall plasser, layout for bare den gruppa, retning eller plassnummerering. Elevene blir sittende
-   på plassnummeret sitt når layouten byttes. **Vis gruppenavn** slår navnene på kartet av og på. En låst elev
-   blir sittende ved tilfeldig fordeling. Navnene på pultene leses fra elevens side, men snus hvis de ellers ville stått
-   opp ned på kartet; stolen viser hvilken vei eleven sitter.
+   5 plasser i klassekartet (for eksempel med eller uten åpning, blokk eller tre på rekke). Overlapper gruppene etter
+   en bredere layout, sier Layout fra og kan ordne dem i rutenettet. Nye klassekart får samme layout, og står rett
+   hvis automatisk orientering er slått av. Dra elever fra listen til plassene, eller trykk **Tilfeldig fordeling**.
+   Klikk på en gruppe for å endre nummer og navn, antall plasser, layout for bare den gruppa, retning eller
+   plassnummerering. Elevene blir sittende på plassnummeret sitt når layouten byttes. **Vis gruppenavn** slår
+   navnene på kartet av og på. En låst elev blir sittende ved tilfeldig fordeling. Navnene på pultene leses fra
+   elevens side, men snus hvis de ellers ville stått opp ned på kartet; stolen viser hvilken vei eleven sitter.
 3. **Denne uka:** rolleoversikten. Plassnummeret er fast, rollen roterer hver mandag. Rotasjonen står stille i
    ferieuker (uker der minst tre av fem skoledager er ferie), og uka etter ferien får elevene nye roller.
 4. **Skriv ut** lar deg velge A4 eller A3: stående for klassekartet og liggende for rolleoversikten. I A3 blir

@@ -37,6 +37,22 @@ function normaliserGruppeoppsett(g, storrelse) {
   return gyldigOppsett(storrelse, g.oppsett) ? g.oppsett : null;
 }
 
+/**
+ * Fra før layoutvalget (kartet har ikke `oppsett`): har alle 5-gruppene lang
+ * arm til høyre, blir det klassens layout for 5, så Layout-knappen og
+ * dialogen viser det gruppene har. Kartet tegnes likt. Er 5-gruppene
+ * blandet, beholder hver gruppe sin egen layout.
+ */
+function langArmForKlassen(k, kart) {
+  const fem = kart.bordgrupper.filter((g) => g.storrelse === 5);
+  if (k.oppsett !== undefined || fem.length === 0 || !fem.every((g) => g.oppsett === 'lang-hoyre')) return kart;
+  return {
+    ...kart,
+    oppsett: { ...kart.oppsett, 5: 'lang-hoyre' },
+    bordgrupper: kart.bordgrupper.map((g) => (g.storrelse === 5 ? { ...g, oppsett: null } : g)),
+  };
+}
+
 function normaliserGruppe(g, i) {
   const storrelse = gyldigStorrelse(g.storrelse);
   const plasser = lagPlasser(storrelse, Array.isArray(g.plasser) ? g.plasser : []).map((p, j) => {
@@ -86,15 +102,17 @@ export function normaliser(data) {
   }));
 
   const klassekart = data.klassekart.filter(erObjekt).map((k, i) =>
-    synkLangArm({
-      id: tekst(k.id) || `kart-${i}`,
-      navn: tekst(k.navn, 'Klassekart'),
-      elevlisteId: tekst(k.elevlisteId),
-      opprettet: erGyldigDato(k.opprettet) ? k.opprettet : iDag(),
-      visGruppenavn: k.visGruppenavn !== false,
-      oppsett: normaliserKlasseoppsett(k.oppsett),
-      bordgrupper: (Array.isArray(k.bordgrupper) ? k.bordgrupper : []).filter(erObjekt).map(normaliserGruppe),
-    }),
+    synkLangArm(
+      langArmForKlassen(k, {
+        id: tekst(k.id) || `kart-${i}`,
+        navn: tekst(k.navn, 'Klassekart'),
+        elevlisteId: tekst(k.elevlisteId),
+        opprettet: erGyldigDato(k.opprettet) ? k.opprettet : iDag(),
+        visGruppenavn: k.visGruppenavn !== false,
+        oppsett: normaliserKlasseoppsett(k.oppsett),
+        bordgrupper: (Array.isArray(k.bordgrupper) ? k.bordgrupper : []).filter(erObjekt).map(normaliserGruppe),
+      }),
+    ),
   );
 
   const rom = erObjekt(inn.rom) ? inn.rom : {};

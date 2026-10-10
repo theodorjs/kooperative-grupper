@@ -1,6 +1,6 @@
 import { nyId } from '../data/id.js';
-import { effektivtOppsett, gyldigOppsett, lagMal } from './maler.js';
-import { normaliserVinkel } from './orientering.js';
+import { effektivtOppsett, gyldigOppsett, lagMal, pultHalvmal } from './maler.js';
+import { gruppeRotasjon, lokalTilRom, normaliserVinkel } from './orientering.js';
 
 export const MIN_GRUPPESTORRELSE = 1;
 export const MAKS_GRUPPESTORRELSE = 5;
@@ -129,13 +129,63 @@ export function lagBordgrupper(storrelser, rom, kart = null) {
   );
 }
 
-/** Én ny bordgruppe i kartet, på neste plass i rutenettet og med neste nummer. */
+/**
+ * Pultene i en gruppe som rektangler i rommet, med layouten og retningen
+ * gruppa har: midtpunkt, halv bredde og dybde (pluss halve `klaring`) og
+ * aksene til gruppa.
+ */
+function pultflater(gruppe, kart, rom, klaring) {
+  const rotasjon = gruppeRotasjon(gruppe, rom);
+  const v = (rotasjon * Math.PI) / 180;
+  const akser = [
+    { x: Math.cos(v), y: Math.sin(v) },
+    { x: -Math.sin(v), y: Math.cos(v) },
+  ];
+  return lagMal(gruppe.storrelse, effektivtOppsett(gruppe, kart)).pulter.map((pult) => {
+    const halv = pultHalvmal(pult.rotasjon);
+    return { ...lokalTilRom(pult, gruppe, rotasjon), halv: [halv.x + klaring / 2, halv.y + klaring / 2], akser };
+  });
+}
+
+/** Om to roterte rektangler overlapper: det gjør de når ingen av aksene deres skiller dem. */
+function flaterOverlapper(a, b) {
+  const prikk = (p, q) => p.x * q.x + p.y * q.y;
+  const radius = (f, u) => f.halv[0] * Math.abs(prikk(f.akser[0], u)) + f.halv[1] * Math.abs(prikk(f.akser[1], u));
+  const avstand = { x: b.x - a.x, y: b.y - a.y };
+  return [...a.akser, ...b.akser].every((u) => Math.abs(prikk(avstand, u)) < radius(a, u) + radius(b, u) - 1e-9);
+}
+
+const pulterOverlapper = (a, b) => a.some((p) => b.some((q) => flaterOverlapper(p, q)));
+
+/** Om pulter i to ulike bordgrupper står oppå hverandre, med layouten og retningen gruppene har nå. */
+export function grupperOverlapper(kart, rom) {
+  const grupper = kart.bordgrupper.map((g) => pultflater(g, kart, rom, 0));
+  return grupper.some((a, i) => grupper.slice(i + 1).some((b) => pulterOverlapper(a, b)));
+}
+
+/**
+ * Én ny bordgruppe i kartet, med neste nummer. Den står på neste plass i
+ * rutenettet hvis det er ledig der. Ellers prøves de andre plassene i
+ * rutenettet og i litt tettere rutenett, bakfra, til gruppa står fritt med
+ * litt klaring (eller i det minste uten å overlappe). Er ingen plass ledig,
+ * brukes neste plass i rutenettet likevel.
+ */
 export function nyBordgruppe(kart, storrelse, rom) {
   const antall = kart.bordgrupper.length;
   const bredeste = bredesteGruppe([...kart.bordgrupper, { storrelse, oppsett: null }], kart);
-  const pos = standardPosisjoner(antall + 1, rom, bredeste)[antall];
+  const rotasjon = rotasjonForNyGruppe(kart.bordgrupper);
+  const kandidater = [];
+  for (let n = antall + 1; n <= antall + 4; n += 1) kandidater.push(...standardPosisjoner(n, rom, bredeste).reverse());
+  const ledig = (klaring) => {
+    const andre = kart.bordgrupper.map((g) => pultflater(g, kart, rom, klaring));
+    return kandidater.find((pos) => {
+      const ny = pultflater({ storrelse, oppsett: null, ...pos, rotasjon }, kart, rom, klaring);
+      return !andre.some((pulter) => pulterOverlapper(ny, pulter));
+    });
+  };
+  const pos = ledig(KLARING) ?? ledig(0) ?? kandidater[0];
   const nummer = Math.max(0, ...kart.bordgrupper.map((g) => g.nummer)) + 1;
-  return lagBordgruppe({ nummer, storrelse, x: pos.x, y: pos.y, rotasjon: rotasjonForNyGruppe(kart.bordgrupper) });
+  return lagBordgruppe({ nummer, storrelse, x: pos.x, y: pos.y, rotasjon });
 }
 
 /**
@@ -262,6 +312,16 @@ export function ordneIRutenett(bordgrupper, rom, kart = null) {
     y: posisjoner[i].y,
     rotasjon: g.rotasjon === null ? null : 0,
   }));
+}
+
+/**
+ * Om noen bordgrupper overlapper nå, men ikke etter «Ordne i rutenett».
+ * Da kan appen foreslå å ordne dem (f.eks. etter at klassen har fått en
+ * bredere layout). Overlapper de også i rutenettet, hjelper det ikke.
+ */
+export function rutenettGirPlass(kart, rom) {
+  if (!grupperOverlapper(kart, rom)) return false;
+  return !grupperOverlapper({ ...kart, bordgrupper: ordneIRutenett(kart.bordgrupper, rom, kart) }, rom);
 }
 
 // ---------------------------------------------------------------------------

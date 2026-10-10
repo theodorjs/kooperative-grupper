@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
-import { harEgetOppsett, klassensOppsett, storrelseForTegning } from '../logikk/grupper.js';
+import { harEgetOppsett, klassensOppsett, rutenettGirPlass, storrelseForTegning } from '../logikk/grupper.js';
 import { oppsettFor, oppsettnavn, STORRELSER_MED_VALG } from '../logikk/maler.js';
 import Oppsettegning, { Oppsettvalg } from './Oppsettegning.jsx';
 
 const grupper = (n) => `${n} ${n === 1 ? 'gruppe' : 'grupper'}`;
 
-/** Menyen med layoutene for hver gruppestørrelse. Lukkes med «Ferdig», Esc eller et trykk utenfor. */
-function Layoutdialog({ kart, onVelg, onLukk }) {
+/**
+ * Menyen med layoutene for hver gruppestørrelse. Lukkes med «Ferdig», Esc
+ * eller et trykk utenfor. Overlapper gruppene (f.eks. etter en bredere
+ * layout), og «Ordne i rutenett» gir dem plass, sier menyen fra øverst.
+ */
+function Layoutdialog({ kart, rom, onVelg, onOrdne, onLukk }) {
   const dialog = useRef(null);
 
   useEffect(() => {
@@ -16,6 +20,7 @@ function Layoutdialog({ kart, onVelg, onLukk }) {
   const antall = (s) => kart.bordgrupper.filter((g) => g.storrelse === s).length;
   // Størrelsene som finnes i kartet, kommer først.
   const storrelser = [...STORRELSER_MED_VALG].sort((a, b) => (antall(b) > 0) - (antall(a) > 0));
+  const overlapper = rutenettGirPlass(kart, rom);
 
   return (
     <dialog
@@ -31,6 +36,16 @@ function Layoutdialog({ kart, onVelg, onLukk }) {
           <button type="button" className="hoved" onClick={() => dialog.current.close()}>
             Ferdig
           </button>
+          <div role="status" className="overlappvarsel">
+            {overlapper && (
+              <p className="liten oppsettmerknad">
+                <span>Noen bordgrupper overlapper nå. Trykk «Ordne i rutenett» for å gi dem plass.</span>
+                <button type="button" onClick={onOrdne}>
+                  Ordne i rutenett
+                </button>
+              </p>
+            )}
+          </div>
         </div>
         <p className="dempet oppsettmeny-ingress">
           Velg hvordan pultene skal stå. Valget gjelder alle gruppene med like mange plasser i dette klassekartet. Skal
@@ -80,7 +95,7 @@ function Layoutdialog({ kart, onVelg, onLukk }) {
  * Knappen «Layout» i verktøylinja. Tegningen viser klassens valg for
  * firergrupper, eller for 3, 2 eller 5 når kartet ikke har firergrupper.
  */
-export default function Oppsettmeny({ kart, onVelg }) {
+export default function Oppsettmeny({ kart, rom, onVelg, onOrdne }) {
   const [apen, setApen] = useState(false);
   const storrelse = storrelseForTegning(kart.bordgrupper);
   const valgt = klassensOppsett(kart, storrelse);
@@ -101,7 +116,7 @@ export default function Oppsettmeny({ kart, onVelg }) {
       <span id="layoutknapp-valg" className="skjult">
         Grupper med {storrelse}: {oppsettnavn(storrelse, valgt)}
       </span>
-      {apen && <Layoutdialog kart={kart} onVelg={onVelg} onLukk={() => setApen(false)} />}
+      {apen && <Layoutdialog kart={kart} rom={rom} onVelg={onVelg} onOrdne={onOrdne} onLukk={() => setApen(false)} />}
     </>
   );
 }

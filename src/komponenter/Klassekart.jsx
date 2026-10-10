@@ -180,9 +180,9 @@ function Orienteringsvalg({ bordgrupper, onEndre }) {
 }
 
 /** En gruppe verktøy med overskrift, så knappene står samlet etter hva de virker på. */
-function Verktoygruppe({ tittel, children }) {
+function Verktoygruppe({ tittel, klasse = '', children }) {
   return (
-    <section className="verktoygruppe" aria-label={tittel}>
+    <section className={`verktoygruppe ${klasse}`.trim()} aria-label={tittel}>
       <h2 className="verktoygruppe-tittel">{tittel}</h2>
       {children}
     </section>
@@ -414,6 +414,13 @@ export default function Klassekart({ data, endre }) {
     if (valgtId && !valgt) setValgtId(null);
   }, [valgtId, valgt]);
 
+  // På smale skjermer (iPad på høykant) står gruppedetaljene under kartet.
+  // Rull dem fram når læreren velger en gruppe, men ikke mens noe dras.
+  useEffect(() => {
+    if (!valgtId || !window.matchMedia?.('(max-width: 900px)').matches) return;
+    document.querySelector('.gruppedetaljer')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [valgtId]);
+
   // --- Tegning --------------------------------------------------------------
 
   if (!kart) {
@@ -448,41 +455,47 @@ export default function Klassekart({ data, endre }) {
         <div className="verktoygrupper">
           <Kartvelger data={data} kart={kart} endre={endre} idag={idag} />
 
-          <Verktoygruppe tittel="Bordgrupper">
-            <label className="kartvalg">
-              <span>Ønsket størrelse</span>
-              <select
-                value={onsketGruppestorrelse}
-                onChange={(e) =>
-                  endre((d) => oppdaterInnstillinger(d, { onsketGruppestorrelse: Number(e.target.value) }))
-                }
-              >
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <Oppsettmeny kart={kart} onVelg={velgKlasseoppsett} />
-            <div className="knapperad">
-              <button type="button" onClick={leggTilGruppe}>
-                Legg til bordgruppe
-              </button>
-              <button type="button" className="fare" onClick={lagGrupperPaNytt}>
-                Lag grupper på nytt
-              </button>
-            </div>
-            <div className="verktoydel">
-              <button type="button" onClick={ordne}>
-                Ordne i rutenett
-              </button>
-              <Orienteringsvalg
-                bordgrupper={kart.bordgrupper}
-                onEndre={(pa) =>
-                  endreKart((k) => ({ ...k, bordgrupper: settAutomatiskOrientering(k.bordgrupper, pa) }))
-                }
-              />
+          <Verktoygruppe tittel="Bordgrupper" klasse="bordgrupper">
+            <div className="bordgrupperdeler">
+              <div className="bordgrupperdel">
+                <div className="knapperad">
+                  <label className="kartvalg">
+                    <span>Ønsket størrelse</span>
+                    <select
+                      value={onsketGruppestorrelse}
+                      onChange={(e) =>
+                        endre((d) => oppdaterInnstillinger(d, { onsketGruppestorrelse: Number(e.target.value) }))
+                      }
+                    >
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <option key={n} value={n}>
+                          {n}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <Oppsettmeny kart={kart} rom={rom} onVelg={velgKlasseoppsett} onOrdne={ordne} />
+                </div>
+                <div className="knapperad">
+                  <button type="button" onClick={leggTilGruppe}>
+                    Legg til bordgruppe
+                  </button>
+                  <button type="button" className="fare" onClick={lagGrupperPaNytt}>
+                    Lag grupper på nytt
+                  </button>
+                </div>
+              </div>
+              <div className="verktoydel">
+                <button type="button" onClick={ordne}>
+                  Ordne i rutenett
+                </button>
+                <Orienteringsvalg
+                  bordgrupper={kart.bordgrupper}
+                  onEndre={(pa) =>
+                    endreKart((k) => ({ ...k, bordgrupper: settAutomatiskOrientering(k.bordgrupper, pa) }))
+                  }
+                />
+              </div>
             </div>
           </Verktoygruppe>
 

@@ -130,3 +130,51 @@ describe.each(SKOLER)('skolefargene til $navn', ({ id }) => {
     expect(svakKontrast({ ...standardMork, ...lyse, ...morke })).toEqual([]);
   });
 });
+
+// Det valgte layoutkortet i Layout-dialogen har en svak aksentflate over kortfargen.
+describe('det valgte layoutkortet', () => {
+  const appcss = readFileSync(new URL('./app.css', import.meta.url), 'utf8');
+  const navn = variabler(blokk(':root', appcss)); // --tekst, --dempet osv.
+
+  /** Tekstfargen en regel i app.css gir, eller null når regelen eller fargen mangler. */
+  function tekstfarge(selektor) {
+    const start = appcss.indexOf(`\n${selektor} {`);
+    if (start === -1) return null;
+    const linje = blokk(selektor, appcss.slice(start)).find((l) => l.startsWith('color:'));
+    return linje ? linje.slice('color:'.length).replace(/;$/, '').trim() : null;
+  }
+
+  const los = (verdi, farger) => {
+    const v = verdi.match(/^var\((--[\w-]+)\)$/);
+    return v ? los(farger[v[1]], farger) : verdi;
+  };
+
+  /** En rgba-farge lagt over en hex-farge, som hex. */
+  function leggOver(rgba, under) {
+    const [r, g, b, a] = rgba.match(/[\d.]+/g).map(Number);
+    const bunn = [1, 3, 5].map((i) => parseInt(under.slice(i, i + 2), 16));
+    return `#${[r, g, b].map((c, i) => Math.round(c * a + bunn[i] * (1 - a)).toString(16).padStart(2, '0')).join('')}`;
+  }
+
+  const temaer = [
+    ['standard lys', standardLys],
+    ['standard mørk', standardMork],
+    ...SKOLER.flatMap(({ id, navn: skole }) => {
+      const lyse = variabler(blokk(`html[data-skole="${id}"]`, skolecss));
+      const morke = variabler(blokk(`html[data-skole="${id}"][data-theme="dark"]`, skolecss));
+      return [
+        [`${skole} lys`, { ...standardLys, ...lyse }],
+        [`${skole} mørk`, { ...standardMork, ...lyse, ...morke }],
+      ];
+    }),
+  ];
+
+  it.each(temaer)('har lesbar beskrivelse (%s)', (_, tema) => {
+    const farger = { ...navn, ...tema };
+    const beskrivelse =
+      tekstfarge(".oppsettvalg[aria-pressed='true'] .oppsettvalg-beskrivelse") ?? tekstfarge('.oppsettvalg-beskrivelse');
+    const kort = los('var(--flate)', farger);
+    const bakgrunn = leggOver(los('var(--aksent-lys)', farger), kort);
+    expect(kontrast(los(beskrivelse, farger), bakgrunn)).toBeGreaterThanOrEqual(4.5);
+  });
+});

@@ -17,7 +17,14 @@ import {
   velgKlassekart,
 } from './operasjoner.js';
 import { plasserteElevIder, tilfeldigFordeling } from '../logikk/tildeling.js';
-import { antallPlasser, settGruppeoppsett, settKlasseoppsett } from '../logikk/grupper.js';
+import {
+  antallPlasser,
+  automatiskOrientering,
+  harEgetOppsett,
+  settAutomatiskOrientering,
+  settGruppeoppsett,
+  settKlasseoppsett,
+} from '../logikk/grupper.js';
 import { effektivtOppsett, lagMal, standardKlasseoppsett } from '../logikk/maler.js';
 
 function minnelager() {
@@ -82,6 +89,29 @@ describe('elevlister og klassekart', () => {
     expect(kopi.oppsett[3]).toBe('rekke');
     const forste = aktivtKlassekart(opprettElevliste(lagStandarddata(), 'K', navn(4)));
     expect(forste.oppsett).toEqual(standardKlasseoppsett());
+  });
+
+  it('lar nye klassekart stå rett når automatisk orientering er slått av i det aktive kartet', () => {
+    const orientering = (data, pa) =>
+      oppdaterKlassekart(data, data.innstillinger.aktivtKlassekartId, (k) => ({
+        ...k,
+        bordgrupper: settAutomatiskOrientering(k.bordgrupper, pa),
+      }));
+    const rotasjoner = (data) => aktivtKlassekart(data).bordgrupper.map((g) => g.rotasjon);
+
+    const av = orientering(dataMedKlasse(), false);
+    expect(automatiskOrientering(aktivtKlassekart(av).bordgrupper)).toBe('ingen');
+    expect(rotasjoner(nyttKlassekart(av, 'Nytt')).every((r) => r === 0)).toBe(true);
+    expect(rotasjoner(opprettElevliste(av, 'Ny gruppe', navn(10))).every((r) => r === 0)).toBe(true);
+
+    const pa = dataMedKlasse();
+    expect(rotasjoner(nyttKlassekart(pa, 'Nytt')).every((r) => r === null)).toBe(true);
+    const blandet = oppdaterKlassekart(pa, pa.innstillinger.aktivtKlassekartId, (k) => ({
+      ...k,
+      bordgrupper: k.bordgrupper.map((g, i) => (i === 0 ? { ...g, rotasjon: 0 } : g)),
+    }));
+    expect(automatiskOrientering(aktivtKlassekart(blandet).bordgrupper)).toBe('noen');
+    expect(rotasjoner(nyttKlassekart(blandet, 'Nytt')).every((r) => r === null)).toBe(true);
   });
 
   it('dupliserer et klassekart med samme plassering men nye ID-er', () => {
@@ -186,6 +216,34 @@ describe('lagring, eksport og import', () => {
     expect(kart.bordgrupper.map((g) => g.langArm)).toEqual(['hoyre', 'venstre', 'venstre', 'venstre']);
     const maler = kart.bordgrupper.map((g) => lagMal(g.storrelse, effektivtOppsett(g, kart)));
     expect(maler).toEqual([lagMal(5, 'lang-hoyre'), lagMal(5), lagMal(4), lagMal(3)]);
+  });
+
+  it('gir klassen lang arm høyre når alle 5-gruppene hadde det før layoutvalget', () => {
+    const gruppe = (id, storrelse, langArm) => ({ id, nummer: 1, storrelse, langArm, x: 2, y: 2, plasser: [] });
+    const gammeltKart = {
+      id: 'k',
+      navn: 'K',
+      elevlisteId: 'x',
+      opprettet: '2026-10-07',
+      bordgrupper: [gruppe('a', 5, 'hoyre'), gruppe('b', 5, 'hoyre'), gruppe('c', 4, 'venstre')],
+    };
+    const data = normaliser({ versjon: 1, elevlister: [], klassekart: [gammeltKart], innstillinger: {} });
+    const kart = data.klassekart[0];
+    expect(kart.oppsett).toEqual({ ...standardKlasseoppsett(), 5: 'lang-hoyre' });
+    expect(kart.bordgrupper.map((g) => g.oppsett)).toEqual([null, null, null]);
+    expect(kart.bordgrupper.map((g) => effektivtOppsett(g, kart))).toEqual(['lang-hoyre', 'lang-hoyre', 'apen']);
+    expect(kart.bordgrupper.map((g) => harEgetOppsett(g, kart))).toEqual([false, false, false]);
+    expect(kart.bordgrupper.map((g) => g.langArm)).toEqual(['hoyre', 'hoyre', 'venstre']);
+
+    // Kart som allerede har layoutvalget, endres ikke.
+    const nyttKart = {
+      ...gammeltKart,
+      oppsett: standardKlasseoppsett(),
+      bordgrupper: gammeltKart.bordgrupper.map((g) => ({ ...g, oppsett: g.storrelse === 5 ? 'lang-hoyre' : null })),
+    };
+    const nye = normaliser({ versjon: 1, elevlister: [], klassekart: [nyttKart], innstillinger: {} }).klassekart[0];
+    expect(nye.oppsett[5]).toBe('lang-venstre');
+    expect(nye.bordgrupper.map((g) => g.oppsett)).toEqual(['lang-hoyre', 'lang-hoyre', null]);
   });
 
   it('retter opp ukjente layouter', () => {
