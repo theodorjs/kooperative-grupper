@@ -115,12 +115,16 @@ function Kartvelger({ data, kart, endre, idag }) {
             <button type="button" onClick={giNyttNavn}>
               Gi nytt navn
             </button>
-            <button type="button" className="fare" onClick={slett}>
-              Slett
-            </button>
           </>
         )}
       </div>
+      {kart && (
+        <Farerad>
+          <button type="button" className="fare" onClick={slett}>
+            Slett
+          </button>
+        </Farerad>
+      )}
     </Verktoygruppe>
   );
 }
@@ -177,6 +181,14 @@ function Orienteringsvalg({ bordgrupper, onEndre }) {
       )}
     </div>
   );
+}
+
+/**
+ * Knapper som sletter eller tømmer, nederst og midtstilt i rammen. Rammene på
+ * samme rad er like høye, så disse knappene står på linje.
+ */
+function Farerad({ children }) {
+  return <div className="farerad">{children}</div>;
 }
 
 /** En gruppe verktøy med overskrift, så knappene står samlet etter hva de virker på. */
@@ -476,14 +488,9 @@ export default function Klassekart({ data, endre }) {
                   </label>
                   <Oppsettmeny kart={kart} rom={rom} onVelg={velgKlasseoppsett} onOrdne={ordne} />
                 </div>
-                <div className="knapperad">
-                  <button type="button" onClick={leggTilGruppe}>
-                    Legg til bordgruppe
-                  </button>
-                  <button type="button" className="fare" onClick={lagGrupperPaNytt}>
-                    Lag grupper på nytt
-                  </button>
-                </div>
+                <button type="button" onClick={leggTilGruppe}>
+                  Legg til bordgruppe
+                </button>
               </div>
               <div className="verktoydel">
                 <button type="button" onClick={ordne}>
@@ -497,17 +504,22 @@ export default function Klassekart({ data, endre }) {
                 />
               </div>
             </div>
+            <Farerad>
+              <button type="button" className="fare" onClick={lagGrupperPaNytt}>
+                Lag grupper på nytt
+              </button>
+            </Farerad>
           </Verktoygruppe>
 
           <Verktoygruppe tittel="Elever">
-            <div className="knapperad">
-              <button type="button" className="hoved" onClick={fordelTilfeldig} disabled={elever.length === 0}>
-                Tilfeldig fordeling
-              </button>
+            <button type="button" className="hoved" onClick={fordelTilfeldig} disabled={elever.length === 0}>
+              Tilfeldig fordeling
+            </button>
+            <Farerad>
               <button type="button" className="fare" onClick={tomAlle}>
                 Tøm alle plasser
               </button>
-            </div>
+            </Farerad>
           </Verktoygruppe>
 
           <Verktoygruppe tittel="Visning">

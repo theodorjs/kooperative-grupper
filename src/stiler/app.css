@@ -537,6 +537,16 @@ legend {
   min-width: 0;
 }
 
+/* Slett, Lag grupper på nytt og Tøm alle plasser: nederst og midtstilt i
+   rammen, slik at de står på linje og skiller seg fra de andre knappene. */
+.farerad {
+  margin-top: auto;
+  align-self: stretch;
+  display: flex;
+  justify-content: center;
+  padding-top: 0.25rem;
+}
+
 .verktoygruppe-tittel {
   font-family: inherit;
   font-size: 0.75rem;
