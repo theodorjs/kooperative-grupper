@@ -49,6 +49,10 @@ h1, h2, h3 {
   margin: 0 0 0.6rem;
 }
 
+h1, h2 {
+  color: var(--bk-overskrift);
+}
+
 h2 {
   font-size: 1.15rem;
 }
@@ -1584,7 +1588,7 @@ legend {
 }
 
 .varsel.ok {
-  background: var(--aksent-lys);
+  background: var(--bk-ok-flate);
 }
 
 /* Bekreftelsen etter en import, øverst på siden, med «Lukk» */

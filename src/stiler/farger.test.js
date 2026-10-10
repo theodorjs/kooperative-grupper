@@ -4,6 +4,7 @@ import { SKOLER } from '../data/skoletema.js';
 
 const css = readFileSync(new URL('./farger.css', import.meta.url), 'utf8');
 const skolecss = readFileSync(new URL('./skoler.css', import.meta.url), 'utf8');
+const appcss = readFileSync(new URL('./app.css', import.meta.url), 'utf8');
 
 function blokk(selektor, kilde = css) {
   const start = kilde.indexOf(`${selektor} {`);
@@ -21,13 +22,25 @@ function variabler(linjer) {
   );
 }
 
+/** Erstatter var(--navn) med verdien den peker på, så hver farge blir en ekte farge. */
+function losOpp(farger) {
+  const verdi = (v) => {
+    const navn = /^var\((--[\w-]+)\)$/.exec(v)?.[1];
+    return navn ? verdi(farger[navn]) : v;
+  };
+  return Object.fromEntries(Object.entries(farger).map(([navn, v]) => [navn, verdi(v)]));
+}
+
+/** En sRGB-kanal (0–255) som lineært lys. */
+function lineaer(kanal) {
+  const c = kanal / 255;
+  return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+}
+
 // Kontrast etter WCAG 2. Tekst skal ha minst 4,5:1.
 function luminans(hex) {
   expect(hex).toMatch(/^#[0-9a-f]{6}$/i);
-  const [r, g, b] = [1, 3, 5].map((i) => {
-    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
-    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  });
+  const [r, g, b] = [1, 3, 5].map((i) => lineaer(parseInt(hex.slice(i, i + 2), 16)));
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
@@ -46,14 +59,80 @@ const KONTRASTPAR = [
   ['--bk-teal', '--bk-bg'],
   ['--bk-teal-dark', '--bk-card'],
   ['--bk-amber-tekst', '--bk-card'],
+  ['--bk-overskrift', '--bk-card'],
+  ['--bk-overskrift', '--bk-bg'],
 ];
 
 /** Tekstfarger som er for svake mot bakgrunnen sin. */
-function svakKontrast(farger) {
+function svakKontrast(fargenavn) {
+  const farger = losOpp(fargenavn);
   return KONTRASTPAR.map(([tekst, bakgrunn]) => ({
     par: `${tekst} på ${bakgrunn}`,
     kontrast: Math.round(kontrast(farger[tekst], farger[bakgrunn]) * 100) / 100,
   })).filter((k) => k.kontrast < 4.5);
+}
+
+/** '#RRGGBB' eller 'rgba(r, g, b, a)' som [r, g, b, a]. */
+function kanaler(farge) {
+  if (String(farge).startsWith('#')) {
+    expect(farge).toMatch(/^#[0-9a-f]{6}$/i);
+    return [...[1, 3, 5].map((i) => parseInt(farge.slice(i, i + 2), 16)), 1];
+  }
+  const tall = /^rgba\(([^)]*)\)$/.exec(farge)?.[1].split(',').map(Number) ?? [];
+  expect(tall, String(farge)).toHaveLength(4);
+  return tall;
+}
+
+/** Fargen en gjennomsiktig flate får over en bakgrunn, som [r, g, b]. */
+function lagtOver(flate, bakgrunn) {
+  const [r, g, b, a] = kanaler(flate);
+  const under = kanaler(bakgrunn);
+  return [r, g, b].map((c, i) => c * a + under[i] * (1 - a));
+}
+
+/** [r, g, b] i CIELAB (hvitpunkt D65). */
+function lab(rgb) {
+  const [r, g, b] = rgb.map(lineaer);
+  const xyz = [
+    (0.4124 * r + 0.3576 * g + 0.1805 * b) / 0.95047,
+    0.2126 * r + 0.7152 * g + 0.0722 * b,
+    (0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883,
+  ];
+  const [fx, fy, fz] = xyz.map((t) => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116));
+  return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)];
+}
+
+/** Flaten i LCh: [lyshet, metning, fargetone i grader]. */
+function lch(rgb) {
+  const [l, a, b] = lab(rgb);
+  return [l, Math.hypot(a, b), ((Math.atan2(b, a) * 180) / Math.PI + 360) % 360];
+}
+
+// Ok-meldingen («Klassen … er lagt inn») og feilmeldingen kommer på samme sted.
+// Flatene skal kunne skilles på fargen, ikke bare på tekstfargen:
+//   - forskjellen (ΔE, CIE76) på kortet skal synes; rundt 2 ses så vidt,
+//   - og ok-flaten skal ikke se ut som en svakere feilflate. Den har enten en annen
+//     fargetone (minst 45° unna) eller er nesten grå (høyst halvparten så mettet).
+const MINSTE_FORSKJELL_OK_FEIL = 6;
+const MINSTE_TONEAVSTAND_OK_FEIL = 45;
+const STORSTE_METNING_OK_MOT_FEIL = 0.5;
+
+/** Hva som eventuelt gjør ok-flaten lik feilflaten på kortet (tom liste er bra). */
+function okLignerFeil(fargenavn) {
+  const farger = losOpp(fargenavn);
+  const ok = lagtOver(farger['--bk-ok-flate'], farger['--bk-card']);
+  const feil = lagtOver(farger['--bk-fare-flate'], farger['--bk-card']);
+  const [okLab, feilLab] = [lab(ok), lab(feil)];
+  const forskjell = Math.hypot(...okLab.map((v, i) => v - feilLab[i]));
+  const [, okMetning, okTone] = lch(ok);
+  const [, feilMetning, feilTone] = lch(feil);
+  const toneavstand = Math.min(Math.abs(okTone - feilTone), 360 - Math.abs(okTone - feilTone));
+  const problemer = [];
+  if (forskjell < MINSTE_FORSKJELL_OK_FEIL) problemer.push(`for lik: ΔE ${forskjell.toFixed(1)}`);
+  if (toneavstand < MINSTE_TONEAVSTAND_OK_FEIL && okMetning > STORSTE_METNING_OK_MOT_FEIL * feilMetning) {
+    problemer.push(`samme fargetone (${toneavstand.toFixed(0)}° unna) og nesten like mettet`);
+  }
+  return problemer;
 }
 
 /** Hvor mange klammer selektoren står inni (0 betyr utenfor alle medieregler). */
@@ -89,6 +168,18 @@ describe('fargesystemet', () => {
       const svake = svakKontrast(farger);
       if (svake.length > 0) console.warn(`Standardfargene (${modus}) har svak kontrast:`, svake);
     }
+  });
+
+  it('har egne fargenavn for overskrifter og ok-meldinger, som standard lik tekst og teal-flate', () => {
+    expect(standardLys['--bk-overskrift']).toBe('var(--bk-ink)');
+    expect(standardLys['--bk-ok-flate']).toBe('var(--bk-teal-flate)');
+    expect(blokk('h1, h2', appcss)).toContain('color: var(--bk-overskrift);');
+    expect(blokk('.varsel.ok', appcss)).toContain('background: var(--bk-ok-flate);');
+  });
+
+  it('skiller ok-meldingen fra feilmeldingen', () => {
+    expect(okLignerFeil(standardLys)).toEqual([]);
+    expect(okLignerFeil(standardMork)).toEqual([]);
   });
 });
 
@@ -128,6 +219,24 @@ describe.each(SKOLER)('skolefargene til $navn', ({ id }) => {
   it('har lesbar tekst i lys og mørk modus', () => {
     expect(svakKontrast({ ...standardLys, ...lyse })).toEqual([]);
     expect(svakKontrast({ ...standardMork, ...lyse, ...morke })).toEqual([]);
+  });
+
+  it('skiller ok-meldingen fra feilmeldingen i lys og mørk modus', () => {
+    expect(okLignerFeil({ ...standardLys, ...lyse })).toEqual([]);
+    expect(okLignerFeil({ ...standardMork, ...lyse, ...morke })).toEqual([]);
+  });
+});
+
+describe('Torderød skole', () => {
+  // Skolens nettside har røde overskrifter, så h1 og h2 skal være røde også her.
+  it('har røde overskrifter i lys og mørk modus', () => {
+    const lyse = variabler(blokk('html[data-skole="torderod"]', skolecss));
+    const morke = variabler(blokk('html[data-skole="torderod"][data-theme="dark"]', skolecss));
+    for (const farge of [lyse['--bk-overskrift'], morke['--bk-overskrift']]) {
+      const [, metning, tone] = lch(kanaler(farge).slice(0, 3));
+      expect(metning, farge).toBeGreaterThan(15);
+      expect(tone < 45 || tone > 340, `${farge}: fargetone ${Math.round(tone)}°`).toBe(true);
+    }
   });
 });
 

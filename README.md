@@ -61,8 +61,9 @@ versjoner av appen tegner 5-gruppene riktig.
 den nettleseren, og utskrifter blir alltid lyse. Fargene kommer fra fargesystemet i «Min bruksanvisning» og ligger i
 `src/stiler/farger.css`.
 
-**Skolefarger:** På Torderød skoles adresse (https://torderodskole.no/cc/) bruker appen skolens farger: dyp rød for
-knapper og lenker, oker som andrefarge og varme, lyse flater. Skolefargene har både lys og mørk variant, så fargevalget
+**Skolefarger:** Når nettadressen begynner med «torderod» (for eksempel https://torderodskole.no/cc/ eller
+torderod.github.io, med eller uten «www.»), bruker appen Torderød skoles farger: dyp rød for knapper, lenker og
+overskrifter, oker som andrefarge og varme, lyse flater. Skolefargene har både lys og mørk variant, så fargevalget
 virker som før, og utskrifter blir lyse. Andre steder brukes de vanlige fargene. Legg til `?skole=torderod` i adressen
 for å se skolefargene, eller `?skole=ingen` for å slå dem av (valget lagres ikke). Under **Innstillinger → Fargevalg**
 står det når skolefargene er i bruk. Skolene står i `src/data/skoletema.js` og i en liten tabell i `index.html`,
