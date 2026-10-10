@@ -1,6 +1,6 @@
 // Adressen for henvendelser om nettsiden. Så lenge den er tom, vises
 // «Kontakt» som vanlig tekst i stedet for en lenke som ikke virker.
-export const KONTAKT_EPOST = '';
+export const KONTAKT_EPOST = 'sandakersverden@gmail.com';
 
 export const SANDAKERS_VERDEN = 'https://theodorjs.github.io/sandakersverden/';
 
