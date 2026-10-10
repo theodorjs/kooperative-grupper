@@ -51,6 +51,7 @@ import { formaterDato, iDag, ukeoverskrift } from '../logikk/uke.js';
 import Bordgruppe from './Bordgruppe.jsx';
 import Elevpanel from './Elevpanel.jsx';
 import Gruppedetaljer from './Gruppedetaljer.jsx';
+import Info from './Info.jsx';
 import Oppsettmeny from './Oppsettmeny.jsx';
 import { Utskriftsknapp, useUtskrift } from './Utskrift.jsx';
 import { SKALA } from './Pult.jsx';
@@ -171,9 +172,9 @@ function Orienteringsvalg({ bordgrupper, onEndre }) {
         />
         Automatisk orientering
       </label>
-      <p id="orientering-forklaring" className="dempet liten">
+      <Info id="orientering-forklaring" className="dempet liten">
         Automatisk orientering roterer pultene sånn at elevene ser mot tavla.
-      </p>
+      </Info>
       {tilstand === 'noen' && (
         <p className="dempet liten">
           {automatiske} av {bordgrupper.length} bordgrupper har automatisk orientering.
@@ -631,10 +632,10 @@ export default function Klassekart({ data, endre }) {
               }}
             />
           ) : (
-            <p className="hint kort">
+            <Info className="hint kort">
               Dra en bordgruppe for å flytte den. Klikk på en gruppe for å endre størrelse, layout, retning eller
               nummerering.
-            </p>
+            </Info>
           )}
           <Elevpanel
             elever={elever}

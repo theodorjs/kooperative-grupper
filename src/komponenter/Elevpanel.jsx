@@ -1,5 +1,6 @@
 import { kortGruppenavn } from '../logikk/grupper.js';
 import Ikon from './Ikon.jsx';
+import Info from './Info.jsx';
 
 const sorterNavn = (a, b) => a.navn.localeCompare(b.navn, 'nb');
 
@@ -44,7 +45,9 @@ export default function Elevpanel({ elever, kart, erMaal, draElevId, onStartDrag
   return (
     <section className={`kort elevpanel${erMaal ? ' maal' : ''}`} data-elevpanel>
       <h2>Elever ({elever.length})</h2>
-      <p className="dempet liten">Dra et navn til en plass. Dra mellom to plasser for å bytte. Dra hit for å ta eleven bort fra plassen.</p>
+      <Info className="dempet liten">
+        Dra et navn til en plass. Dra mellom to plasser for å bytte. Dra hit for å ta eleven bort fra plassen.
+      </Info>
 
       <h3>Uten plass ({utenPlass.length})</h3>
       {utenPlass.length === 0 && <p className="dempet liten">Alle elever har plass.</p>}
