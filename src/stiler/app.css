@@ -538,7 +538,8 @@ legend {
 }
 
 /* Slett, Lag grupper på nytt og Tøm alle plasser: nederst og midtstilt i
-   rammen, slik at de står på linje og skiller seg fra de andre knappene. */
+   rammen (i Bordgrupper: i delen før skillelinja), slik at de står på linje
+   og skiller seg fra de andre knappene. */
 .farerad {
   margin-top: auto;
   align-self: stretch;
@@ -1168,6 +1169,8 @@ legend {
   grid-template-columns: auto minmax(11rem, 1fr);
   gap: 0.55rem 0.8rem;
   width: 100%;
+  /* Fyller rammen, så «Lag grupper på nytt» havner nederst på linje med de andre. */
+  flex-grow: 1;
 }
 
 .bordgrupperdel {

@@ -184,8 +184,9 @@ function Orienteringsvalg({ bordgrupper, onEndre }) {
 }
 
 /**
- * Knapper som sletter eller tømmer, nederst og midtstilt i rammen. Rammene på
- * samme rad er like høye, så disse knappene står på linje.
+ * Knapper som sletter eller tømmer, nederst og midtstilt i rammen (i
+ * Bordgrupper: i delen før skillelinja). Rammene på samme rad er like høye,
+ * så disse knappene står på linje.
  */
 function Farerad({ children }) {
   return <div className="farerad">{children}</div>;
@@ -491,6 +492,11 @@ export default function Klassekart({ data, endre }) {
                 <button type="button" onClick={leggTilGruppe}>
                   Legg til bordgruppe
                 </button>
+                <Farerad>
+                  <button type="button" className="fare" onClick={lagGrupperPaNytt}>
+                    Lag grupper på nytt
+                  </button>
+                </Farerad>
               </div>
               <div className="verktoydel">
                 <button type="button" onClick={ordne}>
@@ -504,11 +510,6 @@ export default function Klassekart({ data, endre }) {
                 />
               </div>
             </div>
-            <Farerad>
-              <button type="button" className="fare" onClick={lagGrupperPaNytt}>
-                Lag grupper på nytt
-              </button>
-            </Farerad>
           </Verktoygruppe>
 
           <Verktoygruppe tittel="Elever">
