@@ -278,12 +278,11 @@ describe('det valgte layoutkortet', () => {
     }),
   ];
 
-  it.each(temaer)('har lesbar beskrivelse (%s)', (_, tema) => {
+  it.each(temaer)('har lesbart navn (%s)', (_, tema) => {
     const farger = { ...navn, ...tema };
-    const beskrivelse =
-      tekstfarge(".oppsettvalg[aria-pressed='true'] .oppsettvalg-beskrivelse") ?? tekstfarge('.oppsettvalg-beskrivelse');
+    const tekst = tekstfarge(".oppsettvalg[aria-pressed='true'] .oppsettvalg-navn") ?? tekstfarge('.oppsettvalg-navn') ?? 'var(--tekst)';
     const kort = los('var(--flate)', farger);
     const bakgrunn = leggOver(los('var(--aksent-lys)', farger), kort);
-    expect(kontrast(los(beskrivelse, farger), bakgrunn)).toBeGreaterThanOrEqual(4.5);
+    expect(kontrast(los(tekst, farger), bakgrunn)).toBeGreaterThanOrEqual(4.5);
   });
 });

@@ -103,7 +103,7 @@ export default function Oppsettegning({ storrelse, oppsett, visNummer = false, r
   );
 }
 
-/** Knapp med tegning, navn og (unntatt i kompakt utgave) beskrivelse av én layout. */
+/** Knapp med tegning og navn på én layout. Tegningen forklarer seg selv; beskrivelsen ligger bare i title. */
 export function Oppsettvalg({ storrelse, oppsett, valgt, kompakt = false, onVelg }) {
   const { navn, beskrivelse } = oppsettFor(storrelse).find((o) => o.id === oppsett);
   return (
@@ -111,12 +111,11 @@ export function Oppsettvalg({ storrelse, oppsett, valgt, kompakt = false, onVelg
       type="button"
       className={kompakt ? 'oppsettvalg kompakt' : 'oppsettvalg'}
       aria-pressed={valgt}
-      title={kompakt ? beskrivelse : undefined}
+      title={beskrivelse}
       onClick={onVelg}
     >
       <Oppsettegning storrelse={storrelse} oppsett={oppsett} visNummer ramme={kompakt ? 'storrelse' : 'alle'} />
       <span className="oppsettvalg-navn">{navn}</span>
-      {!kompakt && <span className="oppsettvalg-beskrivelse">{beskrivelse}</span>}
     </button>
   );
 }

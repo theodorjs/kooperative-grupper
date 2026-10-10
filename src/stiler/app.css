@@ -996,7 +996,7 @@ legend {
 /* Valgknappene med tegning */
 .oppsettvalgliste {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 0.6rem;
 }
 
@@ -1024,17 +1024,6 @@ legend {
 
 .oppsettvalg-navn {
   font-weight: 600;
-}
-
-.oppsettvalg-beskrivelse {
-  font-size: 0.82rem;
-  color: var(--dempet);
-  line-height: 1.35;
-}
-
-/* Den dempede fargen blir for svak mot bakgrunnen på det valgte kortet. */
-.oppsettvalg[aria-pressed='true'] .oppsettvalg-beskrivelse {
-  color: var(--tekst);
 }
 
 .oppsettvalgliste.kompakt {
