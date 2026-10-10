@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { gruppenavn } from '../logikk/grupper.js';
 import { oppsettFor } from '../logikk/maler.js';
 import { normaliserVinkel } from '../logikk/orientering.js';
+import Info from './Info.jsx';
 import { Oppsettvalg } from './Oppsettegning.jsx';
 
 function Navnefelt({ gruppe, onNavn }) {
@@ -77,10 +78,10 @@ export default function Gruppedetaljer({
             <Navnefelt key={`${gruppe.id}:${gruppe.navn}`} gruppe={gruppe} onNavn={onNavn} />
           </label>
         </div>
-        <p className="dempet liten">
+        <Info className="dempet liten">
           Nummeret bestemmer rekkefølgen i rolleoversikten. Velger du et nummer en annen gruppe har, bytter de to
           nummer. Et navn vises i stedet for «Gruppe {gruppe.nummer}».
-        </p>
+        </Info>
       </fieldset>
 
       <fieldset>
@@ -117,9 +118,9 @@ export default function Gruppedetaljer({
               </button>
             </p>
           ) : (
-            <p className="dempet liten oppsettstatus">
+            <Info className="dempet liten oppsettstatus">
               Samme som resten av klassen. Knappen «Layout» øverst endrer alle gruppene med {gruppe.storrelse}.
-            </p>
+            </Info>
           )}
         </fieldset>
       )}
@@ -154,10 +155,10 @@ export default function Gruppedetaljer({
 
       <fieldset>
         <legend>Plasser</legend>
-        <p className="dempet liten">
+        <Info className="dempet liten">
           <strong>Låst:</strong> eleven blir sittende på plassen når du trykker «Tilfeldig fordeling», mens de andre
           elevene får nye plasser. Du kan fortsatt flytte eleven selv ved å dra.
-        </p>
+        </Info>
         <ul className="plassliste">
           {plasser.map((p) => (
             <li key={p.indeks}>

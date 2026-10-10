@@ -9,6 +9,8 @@ const STIER = {
   hank: 'M9 5h.01M15 5h.01M9 12h.01M15 12h.01M9 19h.01M15 19h.01',
   // Sirkel med en pil ned i et brett
   nedlasting: 'M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20zM12 6.5v8M8.75 11.25 12 14.5l3.25-3.25M7.25 13.25v3.5h9.5v-3.5',
+  // i i en sirkel, for forklaringer
+  info: 'M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20zM12 11v5.5M12 7.5h.01',
   // Ark med brettet hjørne
   fil: 'M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7zM14 3v4h4M9 13h6M9 17h6',
 };

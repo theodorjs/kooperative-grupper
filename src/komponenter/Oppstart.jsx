@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { opprettElevliste, tolkNavneliste } from '../data/operasjoner.js';
 import { ImportKnapp } from './Datafil.jsx';
+import Info from './Info.jsx';
 
 export default function Oppstart({ data, endre, onFerdig, onImportert }) {
   const [listenavn, setListenavn] = useState('');
@@ -18,8 +19,8 @@ export default function Oppstart({ data, endre, onFerdig, onImportert }) {
     <section className="kort oppstart">
       <h2>Kom i gang</h2>
       <p>
-        Lim inn elevlisten med ett navn per linje. Appen lager et klassekart med bordgrupper, og du kan fordele elevene
-        og se hvem som har hvilken rolle hver uke.
+        Skriv inn eller lim inn elevlisten med ett navn per linje. Appen lager et klassekart med bordgrupper, og du kan
+        fordele elevene og se hvem som har hvilken rolle hver uke.
       </p>
       <p className="personvern">
         Navnene lagres bare i denne nettleseren. Ingenting sendes over nettet. Har du fått en klasse fra en kollega,
@@ -47,6 +48,10 @@ export default function Oppstart({ data, endre, onFerdig, onImportert }) {
           <span className="dempet">eller</span>
           <ImportKnapp data={data} endre={endre} onImportert={onImportert} />
         </div>
+        <Info felt>
+          Du kan kun importere filer laget av denne nettsiden. Det kan være din egen backup eller en fil fra en
+          kollega.
+        </Info>
       </form>
     </section>
   );

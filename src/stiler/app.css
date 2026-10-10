@@ -635,6 +635,26 @@ legend {
   color: var(--dempet);
 }
 
+/* Forklaringer med informasjonsmerke foran */
+.info {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.info > .ikon {
+  flex: none;
+  margin-top: 0.12em;
+}
+
+.info-felt {
+  background: var(--aksent-lys);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+  margin-top: 0.75rem;
+}
+
 /* Rommet */
 .rom {
   fill: var(--bk-rom);
