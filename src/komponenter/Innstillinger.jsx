@@ -7,6 +7,7 @@ import { aktivSkole } from '../data/skoletema.js';
 import { flyttRotasjonStart } from '../logikk/roller.js';
 import { erGyldigDato, formaterDato, iDag, mandagForDato, ukeoverskrift } from '../logikk/uke.js';
 import { BackupKnapp, DelKlasseKnapp, ImportKnapp } from './Datafil.jsx';
+import Info from './Info.jsx';
 
 function Tallfelt({ verdi, min, max, steg, onEndre, ...rest }) {
   const [utkast, setUtkast] = useState(String(verdi));
@@ -143,7 +144,7 @@ function Ferier({ ferier, onEndre }) {
   );
 }
 
-export default function Innstillinger({ data, endre, onImportert }) {
+export default function Innstillinger({ data, endre, onImportert, eksempel = false }) {
   const inn = data.innstillinger;
   const sett = (endring) => endre((d) => oppdaterInnstillinger(d, endring));
   const idag = iDag();
@@ -262,20 +263,27 @@ export default function Innstillinger({ data, endre, onImportert }) {
       <section className="kort">
         <h2>Data og personvern</h2>
         <p>Alt lagres bare i denne nettleseren på denne maskinen. Appen sender ingenting over nettet.</p>
-        <div className="datavalg">
-          <DelKlasseKnapp data={data}>
-            Sender én klasse med elever og klassekart til en kollegas iPad. Kollegaen lagrer fila og velger «Importer
-            fra fil» i appen.
-          </DelKlasseKnapp>
-          <BackupKnapp data={data}>
-            Alle klasser, roller og innstillinger i én fil. I en ny nettleser får du alt tilbake med «Importer fra fil»
-            på startsiden.
-          </BackupKnapp>
-          <ImportKnapp data={data} endre={endre} onImportert={onImportert}>
-            Klassene i fila legges inn som nye klasser. Dine andre klasser, roller og innstillinger blir ikke
-            endret.
-          </ImportKnapp>
-        </div>
+        {eksempel ? (
+          <Info className="dempet">
+            Deling, backup og import er slått av mens du utforsker eksempelklassen. Trykk «Lag din egen klasse» øverst
+            for å komme i gang.
+          </Info>
+        ) : (
+          <div className="datavalg">
+            <DelKlasseKnapp data={data}>
+              Sender én klasse med elever og klassekart til en kollegas iPad. Kollegaen lagrer fila og velger «Importer
+              fra fil» i appen.
+            </DelKlasseKnapp>
+            <BackupKnapp data={data}>
+              Alle klasser, roller og innstillinger i én fil. I en ny nettleser får du alt tilbake med «Importer fra fil»
+              på startsiden.
+            </BackupKnapp>
+            <ImportKnapp data={data} endre={endre} onImportert={onImportert}>
+              Klassene i fila legges inn som nye klasser. Dine andre klasser, roller og innstillinger blir ikke
+              endret.
+            </ImportKnapp>
+          </div>
+        )}
         <p className="dempet liten">
           Filene inneholder elevnavn. Send dem bare direkte til kolleger, og ikke legg dem i et delt eller offentlig
           område.

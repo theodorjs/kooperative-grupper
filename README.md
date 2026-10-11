@@ -17,7 +17,10 @@ Klassekart og rolleoversikt kan skrives ut eller lagres som PDF.
 ## Bruk
 
 1. **Første oppstart:** skriv inn eller lim inn elevlisten, ett navn per linje. Appen lager et klassekart med grupper
-   etter ønsket gruppestørrelse (standard 4; 21 elever gir 3 grupper med 4 og 3 med 3).
+   etter ønsket gruppestørrelse (standard 4; 21 elever gir 3 grupper med 4 og 3 med 3). Ved siden av (under, på iPad)
+   står et eksempelklassekart med 15 elever. **Utforsk eksempelklassen** åpner hele appen med eksempelet; ingenting
+   lagres, og deling og import er slått av. Eksempelnavnene er blant de vanligste fornavnene på barn født i 2025 (SSB),
+   ikke ekte elever (`src/data/eksempel.js`).
 2. **Klassekart:** verktøyene øverst er samlet i fire grupper: Klassekart, Bordgrupper, Elever og Visning. Dra
    bordgruppene dit de står i rommet. Med **Automatisk orientering** snur gruppene seg sånn at elevene ser mot tavla;
    slår du den av, står alle gruppene rett, parallelt med veggene. **Ordne i rutenett** flytter gruppene tilbake

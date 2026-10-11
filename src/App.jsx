@@ -137,7 +137,7 @@ export default function App() {
         {harElever && fane === 'elever' && <Elevlister data={vist} endre={endre} />}
         {harElever && fane === 'roller' && <Rollene data={vist} endre={endre} />}
         {harElever && fane === 'innstillinger' && (
-          <Innstillinger data={vist} endre={endre} onImportert={visImportmelding} />
+          <Innstillinger data={vist} endre={endre} onImportert={visImportmelding} eksempel={Boolean(eksempel)} />
         )}
       </main>
 

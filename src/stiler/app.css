@@ -407,14 +407,16 @@ legend {
   margin: 0;
 }
 
+/* På iPad og telefon kommer skjemaet først. Skrivefeltet er lavere, så
+   eksempelet under synes uten å rulle. */
 @media (max-width: 900px) {
   .oppstartside {
     grid-template-columns: minmax(0, 1fr);
     max-width: 640px;
   }
 
-  .oppstartside .eksempel {
-    order: -1;
+  .oppstartside textarea {
+    height: 8.5rem;
   }
 }
 
