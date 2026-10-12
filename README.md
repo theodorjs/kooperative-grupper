@@ -73,6 +73,11 @@ står det når skolefargene er i bruk. Skolene står i `src/data/skoletema.js` o
 fargene i `src/stiler/skoler.css`. Testene sjekker at tabellene er like, at de to mørke blokkene er like, og at teksten
 har god nok kontrast.
 
+## Guide for ansatte
+
+En kort guide til lærerne (PDF, to A4-sider) ligger i [`docs/guide/`](docs/guide/), sammen med kilden og en
+beskrivelse av hvordan den lages på nytt.
+
 ## Ferier fra skoleruta til Moss kommune
 
 Feriene hentes automatisk fra
