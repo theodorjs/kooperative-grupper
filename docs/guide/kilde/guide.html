@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<title>Klassekart – en kort guide</title>
+<style>
+  @page { size: A4; margin: 14mm 16mm 14mm; }
+  :root { --rod: #7F1D1D; --knapp: #A50E12; --gull: #A08850; --krem: #FAF6F0; --linje: #EADFD3; --tekst: #2A211C; --dempet: #6E625A; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif; color: var(--tekst); font-size: 10.4pt; line-height: 1.45; }
+  h1 { font-family: Georgia, "Times New Roman", serif; color: var(--rod); font-size: 24pt; margin: 0; line-height: 1.1; }
+  .under { color: var(--dempet); font-size: 11pt; margin: 2mm 0 0; }
+  header { border-bottom: 1.5pt solid var(--rod); padding-bottom: 3mm; margin-bottom: 4mm; display: flex; justify-content: space-between; align-items: flex-end; gap: 6mm; }
+  .adresse { text-align: right; font-size: 9.5pt; color: var(--dempet); white-space: nowrap; }
+  .adresse b { color: var(--tekst); font-size: 11pt; }
+  .ingress { font-size: 11pt; margin: 0 0 5mm; }
+  section { break-inside: avoid; margin-bottom: 4mm; }
+  h2 { font-family: Georgia, "Times New Roman", serif; color: var(--rod); font-size: 14pt; margin: 0 0 2mm; display: flex; align-items: center; gap: 2.5mm; }
+  h2 .nr { display: inline-grid; place-items: center; width: 7mm; height: 7mm; border-radius: 50%; background: var(--knapp); color: #fff; font-family: Inter, system-ui, sans-serif; font-size: 10.5pt; font-weight: 700; }
+  ul { margin: 0; padding-left: 5mm; }
+  li { margin: 0 0 1.2mm; }
+  .knapp { display: inline-block; border: 0.8pt solid var(--linje); border-radius: 1.4mm; padding: 0 1.6mm; background: #fff; font-weight: 600; white-space: nowrap; }
+  .rad { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; align-items: start; }
+  .kartrad { grid-template-columns: 0.85fr 1fr; }
+  figure { margin: 0; }
+  img { display: block; width: 100%; border: 0.6pt solid var(--linje); border-radius: 2mm; }
+  img.smal { width: 72%; margin: 0 auto; }
+  figure:has(img.smal) figcaption { text-align: center; }
+  figcaption { font-size: 8.5pt; color: var(--dempet); margin-top: 1mm; }
+  .tips { background: var(--krem); border-left: 1.2mm solid var(--gull); border-radius: 1.5mm; padding: 2.5mm 3.5mm; margin-top: 2.5mm; }
+  .godt { background: var(--krem); border: 0.8pt solid var(--linje); border-radius: 2.5mm; padding: 3mm 5mm; break-inside: avoid; }
+  .godt h2 { margin-bottom: 2.5mm; }
+  .side2 { break-before: page; }
+  footer { margin-top: 3mm; font-size: 9pt; color: var(--dempet); text-align: center; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Klassekart</h1>
+    <p class="under">En kort guide</p>
+  </div>
+  <div class="adresse">Appen på iPaden din<br><b>torderodskole.no/cc</b></div>
+</header>
+
+<p class="ingress">Lag klassekart med bordgrupper, og la appen fordele samarbeidsrollene. Rollene byttes automatisk hver uke, og alt kan skrives ut.</p>
+
+<section>
+  <h2><span class="nr">1</span>Kom i gang</h2>
+  <div class="rad">
+    <ul>
+      <li>Åpne <b>Kooperative grupper</b> fra Hjem-skjermen på iPaden.</li>
+      <li>Skriv eller lim inn elevene, <b>ett navn per linje</b>.</li>
+      <li>Gi klassen et navn, for eksempel 7A, og trykk <span class="knapp">Lag elevliste</span>.</li>
+      <li>Appen lager bordgrupper med fire elever. Du kan endre størrelsen etterpå.</li>
+    </ul>
+    <div class="tips"><b>Vil du prøve først?</b> Trykk <span class="knapp">Utforsk eksempelklassen</span> på startsiden. Der kan du teste alt, og ingenting lagres.</div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="nr">2</span>Klassekart</h2>
+  <figure>
+    <img src="bilder/verktoy.png" alt="Verktøyene på Klassekart">
+  </figure>
+  <div class="rad kartrad" style="margin-top:3mm">
+    <figure>
+      <img src="bilder/kart.png" alt="Eksempel på et klassekart med roller">
+      <figcaption>Med «Vis roller denne uka» viser fargeprikkene rollen hver elev har.</figcaption>
+    </figure>
+    <ul>
+      <li>Trykk <span class="knapp">Tilfeldig fordeling</span>, eller <b>dra elevene</b> til plassene.</li>
+      <li><b>Dra en bordgruppe</b> for å flytte den. <b>Trykk på en gruppe</b> for å endre antall plasser, layout eller nummer.</li>
+      <li><span class="knapp">Layout</span>: velg hvordan pultene står, for hele klassen.</li>
+      <li><b>Automatisk orientering</b> snur pultene mot tavla. Slå den av for å stille gruppene rett.</li>
+      <li><b>Lås</b> en elev med hengelåsen i elevlista. Eleven blir sittende ved ny fordeling.</li>
+      <li><span class="knapp">Skriv ut klassekart</span>: velg A4 eller A3.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="side2"></div>
+
+<section>
+  <h2><span class="nr">3</span>Denne uka</h2>
+  <div class="rad">
+    <ul>
+      <li>Viser hvem som har hvilken samarbeidsrolle denne uka.</li>
+      <li>Rollene <b>byttes automatisk hver mandag</b>. I ferieuker står rotasjonen stille. Feriene hentes fra skoleruta til Moss kommune.</li>
+    </ul>
+    <ul>
+      <li><span class="knapp">Skriv ut rolleoversikt</span> og heng den opp i klasserommet.</li>
+      <li>Under <b>Rollene</b> kan du endre navn, beskrivelse og ikon på rollene.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <figure>
+    <img class="smal" src="bilder/uka.png" alt="Rolleoversikten for denne uka">
+    <figcaption>Rolleoversikten. Stjerne betyr at eleven har to roller fordi gruppa har færre enn fire elever.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2><span class="nr">4</span>Del med en kollega og ta backup</h2>
+  <p style="margin:0 0 1.5mm">Finn knappene under <b>Innstillinger → Data og personvern</b>.</p>
+  <figure>
+    <img class="smal" src="bilder/data.png" alt="Knappene for deling, backup og import">
+  </figure>
+  <div class="rad" style="margin-top:3mm">
+    <ul>
+      <li><span class="knapp">AirDrop til en kollega</span> sender <b>én klasse</b> med elever og klassekart til en annen iPad.</li>
+      <li>Kollegaen åpner appen og trykker <span class="knapp">Importer fra fil</span>. Klassen legges inn som en <b>ny klasse</b>.</li>
+    </ul>
+    <ul>
+      <li>Har kollegaen allerede en klasse med samme navn, varsler appen at den blir overskrevet.</li>
+      <li><span class="knapp">Last ned en backup</span> lagrer alle klassene dine i én fil. Ta en backup før ferier.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="godt">
+  <h2>Godt å vite</h2>
+  <ul>
+    <li><b>Navnene blir på din iPad.</b> Appen sender ingenting over nettet, og ingen andre kan se klassene dine.</li>
+    <li><b>Bruk alltid appen fra Hjem-skjermen.</b> Data i appen og i nettleseren (eller på en annen adresse) holdes adskilt.</li>
+    <li><b>Filene inneholder elevnavn.</b> Send dem bare direkte til kolleger, og legg dem ikke i delte mapper.</li>
+    <li>Ser du ikke AirDrop i delingsmenyen, kan den være slått av på iPaden. Spør IT-ansvarlig.</li>
+  </ul>
+</div>
+
+<footer>Spørsmål eller forslag? Skriv til <b>sandakersverden@gmail.com</b> · Kooperative grupper er en del av Sandakers Verden</footer>
+
+</body>
+</html>
