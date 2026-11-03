@@ -64,7 +64,7 @@ export default function Rolleoversikt({ data, endre, gaTil }) {
         </button>
       </div>
 
-      <section className="kort rollekort">
+      <section className="kort ukekort">
         <h1 className="ukeoverskrift">{ukeoverskrift(mandag)}</h1>
 
         {!kart && (

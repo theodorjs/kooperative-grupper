@@ -92,9 +92,19 @@
     print-color-adjust: exact;
   }
 
-  /* Rolleoversikt: stor skrift som kan leses fra pultene */
+  /* Rolleoversikt: stor skrift som kan leses fra pultene. Kortet får luft
+     rundt tabellen, så ytterkantene ikke havner helt i papirkanten. */
   .rolleside {
     break-inside: avoid;
+  }
+
+  .ukekort {
+    padding: 6mm 7mm;
+    overflow: visible;
+  }
+
+  .papir-a3 .ukekort {
+    padding: 9mm 10mm;
   }
 
   .ukeoverskrift {
